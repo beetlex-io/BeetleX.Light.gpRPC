@@ -1,0 +1,11 @@
+.vs/
+BeetleX.Ligth.gpRPC.TestConsole/bin/
+BeetleX.Ligth.gpRPC.TestConsole/obj/
+BeetleX.Ligth.gpRPC/bin/
+BeetleX.Ligth.gpRPC/obj/
+gpRPC.ClientApp/bin/
+gpRPC.ClientApp/obj/
+gpRPC.Messages/bin/
+gpRPC.Messages/obj/
+gpRPC.ServerApp/bin/
+gpRPC.ServerApp/obj/

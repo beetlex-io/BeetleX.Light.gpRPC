@@ -1,0 +1,41 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "gpRPC.Messages";
+
+message RegisterReq {
+    uint32 Identifier=1;
+    string FirstName = 2;
+    string LastName = 3;
+    string Email = 4;
+    string Password=5;
+    string Address=6;
+    string City =7;
+    string Remark=8;
+}  
+message RegisterResp{
+    uint32 Identifier=1;
+     bool Success = 2;
+     int64 Time=3;
+}
+
+message User{
+    string FirstName = 2;
+    string LastName = 3;
+    string Email = 4;
+    string Password=5;
+    string Address=6;
+    string City =7;
+    string Remark=8;
+}
+
+message UsersReq{
+    uint32 Identifier=1;
+    uint32 Count=2;
+}
+
+message UsersResp{
+     uint32 Identifier=1;
+     repeated User Items = 2;
+     bool Success=3;
+     string Error=4;
+}

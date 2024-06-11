@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Copyright>Copyright © beetlex-io.com 2019-2024 email:  henryfan@msn.com</Copyright>
+    <SignAssembly>False</SignAssembly>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Authors>henryfan</Authors>
+    <Company>BeetleX.Light</Company>
+    <PackageOutputPath>E:\public</PackageOutputPath>
+    <Version>0.10.24.0611</Version>
+    <RepositoryUrl>https://github.com/beetlex-io/BeetleX.Light</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/beetlex-io/BeetleX.Light</PackageProjectUrl>
+    <Description>high performance dotnet core google protobuf rpc</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BeetleX.Light" Version="0.26.24.611" />
+    <PackageReference Include="Google.Protobuf" Version="3.27.1" />
+  </ItemGroup>
+
+</Project>
