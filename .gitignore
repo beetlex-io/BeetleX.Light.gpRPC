@@ -9,3 +9,6 @@ gpRPC.Messages/bin/
 gpRPC.Messages/obj/
 gpRPC.ServerApp/bin/
 gpRPC.ServerApp/obj/
+gpRPC.ClientApp/Properties/
+gpRPC.ServerApp/Properties/
+*.user
