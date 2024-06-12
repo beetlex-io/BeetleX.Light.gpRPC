@@ -31,6 +31,7 @@ req.Password = "122";
 var resp = await handler.Register(req);
 ```
 ## performance
+Test hardware: 32-core cloud server, 100Gb network
 ### 1 connection 100 concurrency
 ![image](https://github.com/beetlex-io/BeetleX.Light.gpRPC/assets/2564178/4fd533f0-4e1d-47cf-a2d9-48a51fe5085c)
 
