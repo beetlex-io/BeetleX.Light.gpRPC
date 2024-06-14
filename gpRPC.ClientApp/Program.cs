@@ -52,7 +52,8 @@ foreach (var client in clients)
     IUserHandler handler = client.Create<IUserHandler>();
     for (int i = 0; i < users; i++)
     {
-        var task = Test.Run(handler, client);
+        var task = Test.Register(handler, client);
+        task = Test.Users(handler, client);
     }
 }
 
@@ -61,7 +62,24 @@ await NetClientDebug.Default.Debug();
 
 public class Test
 {
-    public static async Task Run(IUserHandler handler, RpcClient client)
+    public static async Task Users(IUserHandler handler, RpcClient client)
+    {
+        Random ran = new Random();
+        while (true)
+        {
+            try
+            {
+                var userReq = new UsersReq();
+                userReq.Count = (uint)ran.Next(1, 30);
+                var users = await handler.Users(userReq);
+            }
+            catch (Exception e)
+            {
+                client.GetLoger(LogLevel.Error)?.WriteException(client, "TEST", "Run", e);
+            }
+        }
+    }
+    public static async Task Register(IUserHandler handler, RpcClient client)
     {
         Random ran = new Random();
         while (true)
@@ -75,11 +93,7 @@ public class Test
                 register.FirstName = "fan";
                 register.LastName = "henryfan";
                 register.Password = "123456";
-
-                var resp = handler.Register(register);
-                var userReq = new UsersReq();
-                userReq.Count = (uint)ran.Next(1, 30);
-                var users = await handler.Users(userReq);
+                var resp = await handler.Register(register);
             }
             catch (Exception e)
             {

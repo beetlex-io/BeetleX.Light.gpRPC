@@ -17,8 +17,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BeetleX.Light" Version="0.26.24.611" />
     <PackageReference Include="Google.Protobuf" Version="3.27.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BeetleX.Light\BeetleX.Light\BeetleX.Light\BeetleX.Light.csproj" />
   </ItemGroup>
 
 </Project>

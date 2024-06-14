@@ -18,6 +18,7 @@ namespace BeetleX.Ligth.gpRPC
             Options.SynchronousIO = false;
             Options.SessionSingleIOQueue = false;
             Options.ServerName = "google protobuf rpc";
+            Options.ReturnSendDelay = true;
             Options.SetDefaultListen(o =>
             {
                 o.SetProtocolChannel<ProtobufChannel<NetContext>>();
