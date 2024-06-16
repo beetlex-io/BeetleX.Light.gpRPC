@@ -13,7 +13,7 @@ namespace BeetleX.Ligth.gpRPC
     {
         public RpcClient(string host, int port) : base(host, port)
         {
-            ReturnSendDelay = true;
+            ReturnSendDelay = false;
         }
         public static implicit operator RpcClient((string, int) info)
         {

@@ -17,9 +17,9 @@ Console.Write("Enter server address(tcp://host:port):");
 var uriStr = Console.ReadLine();
 var uri = new Uri(uriStr);
 int connections = 0;
-while (connections < 1 || connections > 100)
+while (connections < 1 || connections > 1000)
 {
-    Console.Write("Enter connections(1-100):");
+    Console.Write("Enter connections(1-1000):");
     var conns = Console.ReadLine();
     int.TryParse(conns, out connections);
 }
