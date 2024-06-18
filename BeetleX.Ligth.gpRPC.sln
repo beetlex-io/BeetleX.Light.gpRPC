@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gpRPC.ClientApp", "gpRPC.Cl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gpRPC.Messages", "gpRPC.Messages\gpRPC.Messages.csproj", "{0C20C6BB-7650-493C-A678-96C9A82A4D4D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeetleX.Light", "..\BeetleX.Light\BeetleX.Light\BeetleX.Light\BeetleX.Light.csproj", "{F2168D65-EDEB-4472-8FFC-EF22C318E339}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,10 +41,6 @@ Global
 		{0C20C6BB-7650-493C-A678-96C9A82A4D4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C20C6BB-7650-493C-A678-96C9A82A4D4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C20C6BB-7650-493C-A678-96C9A82A4D4D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F2168D65-EDEB-4472-8FFC-EF22C318E339}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F2168D65-EDEB-4472-8FFC-EF22C318E339}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F2168D65-EDEB-4472-8FFC-EF22C318E339}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F2168D65-EDEB-4472-8FFC-EF22C318E339}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

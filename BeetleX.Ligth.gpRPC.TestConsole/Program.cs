@@ -6,17 +6,16 @@ using BeetleX.Ligth.gpRPC.TestConsole;
 
 
 RpcServer<ApplicationBase> server = new RpcServer<ApplicationBase>();
-server.Options.SetDefaultListen(o =>
-{
-    o.Port = 8080;
-});
+server.CertificateFile = "generate.pfx";
+server.CertificatePassword = "12345678";
 server.RegisterMessages<RegisterReq>();
 server.Options.AddLogOutputHandler<LogOutputToConsole>();
 server.Options.LogLevel = LogLevel.Trace;
 server.Start();
 await Task.Delay(3000);
 
-RpcClient client = "tcp://localhost:8080";
+RpcClient client = "tcp://localhost:8081";
+client.SslServiceName = "beetlex-io.com";
 client.AddLogOutputHandler<LogOutputToConsole>();
 client.RegisterMessages<RegisterReq>();
 client.LogLevel = LogLevel.Trace;

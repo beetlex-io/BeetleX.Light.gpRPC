@@ -22,5 +22,10 @@
   <ItemGroup>
     <ProjectReference Include="..\BeetleX.Ligth.gpRPC\BeetleX.Ligth.gpRPC.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="generate.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

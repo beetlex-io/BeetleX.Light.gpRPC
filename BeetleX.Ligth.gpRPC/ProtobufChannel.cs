@@ -1,6 +1,7 @@
 ﻿using BeetleX.Light;
 using BeetleX.Light.Memory;
 using BeetleX.Light.Protocols;
+using BeetleX.Ligth.gpRPC.Messages;
 using Google.Protobuf;
 using System;
 using System.Collections.Generic;
@@ -28,8 +29,10 @@ namespace BeetleX.Ligth.gpRPC
             writer.WriteBinaryObject(HeaderSizeType.UInt, message,
                 (stream, msg) =>
                 {
-                    ProtocolMessageMapperFactory.UintMapper.WriteType(stream, message, writer.LittleEndian);
-                    IMessage message1 = (IMessage)msg;
+                    RpcMessage rpcMessage = msg as RpcMessage;
+                    ProtocolMessageMapperFactory.UintMapper.WriteType(stream, rpcMessage.Body, writer.LittleEndian);
+                    stream.Write(rpcMessage.Identifier);
+                    IMessage message1 = (IMessage)rpcMessage.Body;
                     message1.WriteTo(stream);
                 });
         }
@@ -39,11 +42,15 @@ namespace BeetleX.Ligth.gpRPC
             while (reader.TryReadBinaryObject(HeaderSizeType.UInt,
                     out object result, memory =>
                     {
+                        RpcMessage rpcMessage = new RpcMessage();
                         var type = ProtocolMessageMapperFactory.UintMapper.ReadType(memory, reader.LittleEndian);
                         memory = memory.Slice(type.BuffersLength);
+                        rpcMessage.Identifier = memory.Span.ReadUInt32();
+                        memory = memory.Slice(4);
                         IMessage message = (IMessage)Activator.CreateInstance(type.MessageType);
                         message.MergeFrom(memory.Span);
-                        return message;
+                        rpcMessage.Body = message;
+                        return rpcMessage;
                     })
                    )
             {

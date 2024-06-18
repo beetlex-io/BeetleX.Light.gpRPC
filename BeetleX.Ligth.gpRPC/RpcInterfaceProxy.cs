@@ -1,4 +1,5 @@
 ﻿using BeetleX.Light.Protocols;
+using Google.Protobuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace BeetleX.Ligth.gpRPC
             if (mHandlers.TryGetValue(req, out var handler))
             {
                 var resp = handler.GetCompletionSource();
-                var reqs = RpcClient.Request((IIdentifier)args[0]);
+                var reqs = RpcClient.Request((IMessage)args[0]);
                 resp.Wait(reqs);
                 return resp.GetTask();
             }
@@ -51,9 +52,7 @@ namespace BeetleX.Ligth.gpRPC
                     continue;
                 var req = method.GetParameters()[0].ParameterType;
                 var resp = method.ReturnType.GetGenericArguments()[0];
-                if (resp.GetInterface("Google.Protobuf.IMessage") == null || req.GetInterface("Google.Protobuf.IMessage") == null ||
-                    resp.GetInterface("BeetleX.Light.Protocols.IIdentifier") == null || req.GetInterface("BeetleX.Light.Protocols.IIdentifier") == null
-                    )
+                if (resp.GetInterface("Google.Protobuf.IMessage") == null || req.GetInterface("Google.Protobuf.IMessage") == null)
                     continue;
                 ActionHandler action = new ActionHandler(method);
                 mHandlers[req] = action;

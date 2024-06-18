@@ -8,25 +8,25 @@ using System.Threading.Tasks;
 namespace BeetleX.Ligth.gpRPC.TestConsole
 {
     [ProtocolObject(101u)]
-    public partial class RegisterReq : IIdentifier
+    public partial class RegisterReq
     {
 
     }
 
     [ProtocolObject(102u)]
-    public partial class RegisterResp : IIdentifier
+    public partial class RegisterResp
     {
 
     }
 
     [ProtocolObject(201u)]
-    public partial class UsersReq : IIdentifier
+    public partial class UsersReq
     {
 
     }
 
     [ProtocolObject(202u)]
-    public partial class UsersResp : IIdentifier
+    public partial class UsersResp
     {
 
     }

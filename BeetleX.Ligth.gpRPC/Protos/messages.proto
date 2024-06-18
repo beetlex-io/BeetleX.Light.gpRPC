@@ -1,0 +1,21 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "BeetleX.Ligth.gpRPC.Messages";
+
+message Error {
+    uint32 ErrorCode=1;
+    string ErrorMessage=2;
+    string StackTrace=3;
+    
+}  
+message LoginReq{
+   string UserName=1;
+   string Password=2;
+}
+
+message LoginResp{
+    string Rold=1;
+    bool Success=2;
+    string Token=3;
+}
+

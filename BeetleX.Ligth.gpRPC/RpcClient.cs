@@ -1,5 +1,7 @@
 ﻿using BeetleX.Light.Clients;
 using BeetleX.Light.Protocols;
+using BeetleX.Ligth.gpRPC.Messages;
+using Google.Protobuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +16,8 @@ namespace BeetleX.Ligth.gpRPC
         public RpcClient(string host, int port) : base(host, port)
         {
             ReturnSendDelay = false;
+            RegisterMessages<RpcClient>();
+            TimeOut = 1000000;
         }
         public static implicit operator RpcClient((string, int) info)
         {
@@ -27,6 +31,26 @@ namespace BeetleX.Ligth.gpRPC
             var NetClient = new RpcClient(uriInfo.Host, uriInfo.Port);
             return NetClient;
         }
+
+        public async Task<object> Request<REQ>(REQ message)
+           where REQ : IMessage
+        {
+            RpcMessage req = new RpcMessage();
+            req.Body = message;
+            var result = (RpcMessage)await ((IAwaiterNetClient)this).Request(req);
+            if (result.Body is Error err)
+            {
+                throw new Exception(err.ErrorMessage);
+            }
+            return result.Body;
+        }
+        public async Task<RESP> Request<REQ, RESP>(REQ message)
+            where RESP : IMessage
+            where REQ : IMessage
+        {
+            return (RESP)await Request<REQ>(message);
+        }
+
         public void RegisterMessages<T>()
         {
             ProtocolMessageMapperFactory.UintMapper.RegisterAssembly<T>();

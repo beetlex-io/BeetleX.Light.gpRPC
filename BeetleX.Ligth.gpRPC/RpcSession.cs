@@ -2,6 +2,7 @@
 using BeetleX.Light.Clients;
 using BeetleX.Light.Logs;
 using BeetleX.Light.Protocols;
+using BeetleX.Ligth.gpRPC.Messages;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -40,42 +41,47 @@ namespace BeetleX.Ligth.gpRPC
             NetContext.Send(message);
         }
 
-        public void Receive(NetContext context, object message)
+        public Task Receive(NetContext context, object message)
         {
-            OnReceiveMessage(message);
+            return OnReceiveMessage(message);
         }
 
-        protected virtual async void OnReceiveMessage(object message)
+        protected virtual async Task OnReceiveMessage(object message)
         {
 
-
-            var method = MessageSessionHandlers.Default.GetMethod(message.GetType());
+            RpcMessage req = (RpcMessage)message;
+            RpcMessage resp = new RpcMessage();
+            resp.Identifier = req.Identifier;
+            var method = MessageSessionHandlers.Default.GetMethod(req.Body.GetType());
             if (method != null)
             {
                 try
                 {
-                    NetContext.GetLoger(LogLevel.Debug)?.Write(NetContext, "gpRPCSession", "Call", $"{message.GetType().Name} starting");
-                    Task task = (Task)method.Method.Invoke(method.Service, new object[] { message });
+                    Task task = (Task)method.Method.Invoke(method.Service, new object[] { req.Body });
                     await task;
                     var result = method.ResultProperty.GetValue(task);
-                    IIdentifier req = (IIdentifier)message;
-                    IIdentifier resp = (IIdentifier)result;
-                    resp.Identifier = req.Identifier;
-                    NetContext?.Send(resp);
-                    NetContext.GetLoger(LogLevel.Debug)?.Write(NetContext, "gpRPCSession", "Call", $"{message.GetType().Name} returned");
+                    resp.Body = result;
+                    NetContext.GetLoger(LogLevel.Debug)?.Write(NetContext, "gpRPCSession", "InvokeSuccess", $"{req.Body.GetType().Name}");
 
                 }
                 catch (Exception e_)
                 {
-                    NetContext?.GetLoger(LogLevel.Error)?.WriteException(NetContext, "gpRPCSession", message.GetType().Name, e_);
+                    Error error = new Error();
+                    error.ErrorMessage = e_.Message;
+                    error.StackTrace = e_.StackTrace;
+                    resp.Body = error;
+                    NetContext?.GetLoger(LogLevel.Error)?.Write(NetContext, "gpRPCSession", "InvokeError", $"{req.Body.GetType().Name} invok error {e_.Message} {e_.StackTrace}!");
                 }
 
             }
             else
             {
-                NetContext?.GetLoger(LogLevel.Warring)?.Write(NetContext, "gpRPCSession", "Call", $"{message.GetType().Name} handler not found!");
+                Error error = new Error();
+                error.ErrorMessage = $"{req.Body.GetType().Name} handler not found!";
+                resp.Body = error;
+                NetContext?.GetLoger(LogLevel.Warring)?.Write(NetContext, "gpRPCSession", "InvokeError", $"{req.Body.GetType().Name} handler not found!");
             }
-
+            NetContext?.Send(resp);
         }
 
         public virtual void ReceiveCompleted(int bytes)
@@ -120,9 +126,7 @@ namespace BeetleX.Ligth.gpRPC
                         continue;
                     var req = method.GetParameters()[0].ParameterType;
                     var resp = method.ReturnType.GetGenericArguments()[0];
-                    if (resp.GetInterface("Google.Protobuf.IMessage") == null || req.GetInterface("Google.Protobuf.IMessage") == null ||
-                        resp.GetInterface("BeetleX.Light.Protocols.IIdentifier") == null || req.GetInterface("BeetleX.Light.Protocols.IIdentifier") == null
-                        )
+                    if (resp.GetInterface("Google.Protobuf.IMessage") == null || req.GetInterface("Google.Protobuf.IMessage") == null)
                         continue;
                     server.GetLoger(LogLevel.Info)?.Write((EndPoint)null, "gpRPC", "ObjectMapping", $"{req.Name} mapping to {type.Name}.{method.Name}");
                     var handler = new MethodInvokeHandler(method);
