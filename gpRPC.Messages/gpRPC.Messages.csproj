@@ -21,7 +21,7 @@
     <None Remove="Protos\messages.proto" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BeetleX.Ligth.gpRPC\BeetleX.Ligth.gpRPC.csproj" />
+    <ProjectReference Include="..\BeetleX.Light.gpRPC\BeetleX.Light.gpRPC.csproj" />
   </ItemGroup>
 
 </Project>

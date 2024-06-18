@@ -1,11 +1,11 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using BeetleX.Light;
 using BeetleX.Light.Logs;
-using BeetleX.Ligth.gpRPC;
-using BeetleX.Ligth.gpRPC.TestConsole;
+using BeetleX.Light.gpRPC;
+using BeetleX.Light.gpRPC.TestConsole;
 
 
-RpcServer<ApplicationBase> server = new RpcServer<ApplicationBase>();
+RpcServer server = new RpcServer();
 server.CertificateFile = "generate.pfx";
 server.CertificatePassword = "12345678";
 server.RegisterMessages<RegisterReq>();
@@ -19,6 +19,8 @@ client.SslServiceName = "beetlex-io.com";
 client.AddLogOutputHandler<LogOutputToConsole>();
 client.RegisterMessages<RegisterReq>();
 client.LogLevel = LogLevel.Trace;
+client.UserName = "admin";
+client.Password = "123456";
 IUserHandler handler = client.Create<IUserHandler>();
 RegisterReq req = new RegisterReq();
 req.Address = $"guangzhouLongdong";

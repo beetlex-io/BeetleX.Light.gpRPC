@@ -2,7 +2,7 @@
 using BeetleX.Light;
 using BeetleX.Light.Logs;
 using BeetleX.Light.Protocols;
-using BeetleX.Ligth.gpRPC;
+using BeetleX.Light.gpRPC;
 using gpRPC.Messages;
 using System;
 
@@ -23,7 +23,7 @@ Console.WriteLine("");
 Console.WriteLine($"Info [Port:{port}] enter to start...");
 Console.ReadLine();
 
-RpcServer<ApplicationBase> netServer = new RpcServer<ApplicationBase>();
+RpcServer netServer = new RpcServer();
 netServer.Options.LogLevel = LogLevel.Info;
 netServer.Options.AddLogOutputHandler<LogOutputToConsole>();
 netServer.RegisterMessages<UsersReq>();

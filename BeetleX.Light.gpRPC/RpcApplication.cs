@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeetleX.Ligth.gpRPC.Gateway
+namespace BeetleX.Light.gpRPC
 {
-    public class RpcGatewayChannel
+    public class RpcApplication:ApplicationBase
     {
     }
 }

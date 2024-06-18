@@ -1,5 +1,5 @@
 ﻿using BeetleX.Light.Protocols;
-using BeetleX.Ligth.gpRPC;
+using BeetleX.Light.gpRPC;
 using System;
 using System.Collections.Generic;
 using System.Linq;

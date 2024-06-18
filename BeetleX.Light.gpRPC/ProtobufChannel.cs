@@ -1,7 +1,7 @@
 ﻿using BeetleX.Light;
 using BeetleX.Light.Memory;
 using BeetleX.Light.Protocols;
-using BeetleX.Ligth.gpRPC.Messages;
+using BeetleX.Light.gpRPC.Messages;
 using Google.Protobuf;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeetleX.Ligth.gpRPC
+namespace BeetleX.Light.gpRPC
 {
     public class ProtobufChannel<T> : IProtocolChannel<T>
          where T : INetContext
@@ -30,7 +30,7 @@ namespace BeetleX.Ligth.gpRPC
                 (stream, msg) =>
                 {
                     RpcMessage rpcMessage = msg as RpcMessage;
-                    ProtocolMessageMapperFactory.UintMapper.WriteType(stream, rpcMessage.Body, writer.LittleEndian);
+                    rpcMessage.Type = ProtocolMessageMapperFactory.UintMapper.WriteType(stream, rpcMessage.Body, writer.LittleEndian);
                     stream.Write(rpcMessage.Identifier);
                     IMessage message1 = (IMessage)rpcMessage.Body;
                     message1.WriteTo(stream);
@@ -44,6 +44,7 @@ namespace BeetleX.Ligth.gpRPC
                     {
                         RpcMessage rpcMessage = new RpcMessage();
                         var type = ProtocolMessageMapperFactory.UintMapper.ReadType(memory, reader.LittleEndian);
+                        rpcMessage.Type = type.Value;
                         memory = memory.Slice(type.BuffersLength);
                         rpcMessage.Identifier = memory.Span.ReadUInt32();
                         memory = memory.Slice(4);

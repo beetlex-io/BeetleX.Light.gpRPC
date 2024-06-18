@@ -4,7 +4,7 @@ using BeetleX.Light.Clients;
 using BeetleX.Light.Extension;
 using BeetleX.Light.Logs;
 using BeetleX.Light.Protocols;
-using BeetleX.Ligth.gpRPC;
+using BeetleX.Light.gpRPC;
 using gpRPC.Messages;
 using System.Xml;
 
@@ -43,6 +43,8 @@ for (int i = 0; i < connections; i++)
     client.AddLogOutputHandler<LogOutputToConsole>();
     client.RegisterMessages<UsersReq>();
     client.LogLevel = LogLevel.Info;
+    client.UserName = "admin";
+    client.Password = "123456";
     client.TimeOut = 10000;
     clients.Add(client);
 }

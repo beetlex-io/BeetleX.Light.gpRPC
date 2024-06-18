@@ -5,17 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeetleX.Ligth.gpRPC.Messages
+namespace BeetleX.Light.gpRPC.Messages
 {
-    [ProtocolObject(1000000u)]
+    [ProtocolObject(2000000001u)]
     public partial class Error
     {
     }
-    [ProtocolObject(1000001u)]
+    [ProtocolObject(2000000002u)]
     public partial class LoginReq
     {
     }
-    [ProtocolObject(1000002u)]
+    [ProtocolObject(2000000003u)]
     public partial class LoginResp
     {
     }

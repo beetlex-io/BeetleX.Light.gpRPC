@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeetleX.Ligth.gpRPC.TestConsole
+namespace BeetleX.Light.gpRPC.TestConsole
 {
     [ProtocolObject(101u)]
     public partial class RegisterReq

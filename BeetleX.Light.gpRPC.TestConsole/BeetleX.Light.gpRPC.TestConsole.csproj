@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BeetleX.Light" Version="0.33.24.618" />
     <PackageReference Include="Grpc.Tools" Version="2.64.0" PrivateAssets="All">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -20,7 +21,7 @@
     <None Remove="Protos\messages.proto" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BeetleX.Ligth.gpRPC\BeetleX.Ligth.gpRPC.csproj" />
+    <ProjectReference Include="..\BeetleX.Light.gpRPC\BeetleX.Light.gpRPC.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="generate.pfx">

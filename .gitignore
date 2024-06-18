@@ -12,3 +12,7 @@ gpRPC.ServerApp/obj/
 gpRPC.ClientApp/Properties/
 gpRPC.ServerApp/Properties/
 *.user
+BeetleX.Light.gpRPC.TestConsole/bin/
+BeetleX.Light.gpRPC.TestConsole/obj/
+BeetleX.Light.gpRPC/bin/
+BeetleX.Light.gpRPC/obj/

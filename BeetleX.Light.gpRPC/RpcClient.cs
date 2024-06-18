@@ -1,6 +1,6 @@
 ﻿using BeetleX.Light.Clients;
 using BeetleX.Light.Protocols;
-using BeetleX.Ligth.gpRPC.Messages;
+using BeetleX.Light.gpRPC.Messages;
 using Google.Protobuf;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeetleX.Ligth.gpRPC
+namespace BeetleX.Light.gpRPC
 {
     public class RpcClient : AwaiterNetClient<ProtobufChannel<NetClient>>
     {
@@ -18,7 +18,14 @@ namespace BeetleX.Ligth.gpRPC
             ReturnSendDelay = false;
             RegisterMessages<RpcClient>();
             TimeOut = 1000000;
+            Connecting = OnConnect;
         }
+
+        public string UserName { get; set; }
+
+        public string Password { get; set; }
+
+
         public static implicit operator RpcClient((string, int) info)
         {
             var NetClient = new RpcClient(info.Item1, info.Item2);
@@ -32,8 +39,7 @@ namespace BeetleX.Ligth.gpRPC
             return NetClient;
         }
 
-        public async Task<object> Request<REQ>(REQ message)
-           where REQ : IMessage
+        public async Task<object> Request(IMessage message)
         {
             RpcMessage req = new RpcMessage();
             req.Body = message;
@@ -44,11 +50,22 @@ namespace BeetleX.Ligth.gpRPC
             }
             return result.Body;
         }
-        public async Task<RESP> Request<REQ, RESP>(REQ message)
+        public async Task<RESP> Request<RESP>(IMessage message)
             where RESP : IMessage
-            where REQ : IMessage
         {
-            return (RESP)await Request<REQ>(message);
+            return (RESP)await Request(message);
+        }
+
+        private async Task OnConnect(NetClient client)
+        {
+            LoginReq req = new LoginReq();
+            if(!string.IsNullOrEmpty(Password))
+                req.Password = Password;
+            if (!string.IsNullOrEmpty(UserName))
+                req.UserName = UserName;
+            var resp = await Request<LoginResp>(req);
+            if (!resp.Success)
+                throw new BXException(resp.ErrorMessage);
         }
 
         public void RegisterMessages<T>()

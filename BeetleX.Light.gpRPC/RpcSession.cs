@@ -2,7 +2,7 @@
 using BeetleX.Light.Clients;
 using BeetleX.Light.Logs;
 using BeetleX.Light.Protocols;
-using BeetleX.Ligth.gpRPC.Messages;
+using BeetleX.Light.gpRPC.Messages;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,7 +12,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeetleX.Ligth.gpRPC
+namespace BeetleX.Light.gpRPC
 {
     public class RpcSession : ISession
     {
@@ -26,9 +26,12 @@ namespace BeetleX.Ligth.gpRPC
 
         public NetContext NetContext { get; private set; }
 
+        public RpcServer RpcServer { get; internal set; }
+
         public virtual void Connected(NetContext context)
         {
             NetContext = context;
+            RpcServer = (RpcServer)context.Server;
         }
 
         public virtual void Dispose(NetContext context)
@@ -43,13 +46,38 @@ namespace BeetleX.Ligth.gpRPC
 
         public Task Receive(NetContext context, object message)
         {
-            return OnReceiveMessage(message);
+
+            RpcMessage rpcmsg = (RpcMessage)message;
+
+            if (rpcmsg.Body is LoginReq req)
+            {
+                RpcMessage resp = new RpcMessage();
+                resp.Identifier = rpcmsg.Identifier;
+                LoginResp loginResp = new LoginResp();
+                if (req.UserName == RpcServer.UserName && req.Password == RpcServer.Password)
+                {
+                    loginResp.Success = true;
+                    context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCSession", "Login", "Success");
+                }
+                else
+                {
+                    loginResp.Success = false;
+                    loginResp.ErrorMessage = "Invalid user name or password!";
+                    context.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Login", loginResp.ErrorMessage);
+                }
+                resp.Body = loginResp;
+                NetContext?.Send(resp);
+                return Task.CompletedTask;
+            }
+            else
+            {
+                return OnReceiveMessage(rpcmsg);
+            }
         }
 
-        protected virtual async Task OnReceiveMessage(object message)
+        protected virtual async Task OnReceiveMessage(RpcMessage req)
         {
 
-            RpcMessage req = (RpcMessage)message;
             RpcMessage resp = new RpcMessage();
             resp.Identifier = req.Identifier;
             var method = MessageSessionHandlers.Default.GetMethod(req.Body.GetType());

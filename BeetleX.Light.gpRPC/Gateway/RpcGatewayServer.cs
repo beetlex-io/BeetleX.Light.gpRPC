@@ -1,5 +1,6 @@
 ﻿using BeetleX.Light;
 using BeetleX.Light.Protocols;
+using Google.Protobuf.WellKnownTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,11 @@ using System.Reflection;
 using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
-using static BeetleX.Ligth.gpRPC.RpcSession;
 
-namespace BeetleX.Ligth.gpRPC
+namespace BeetleX.Light.gpRPC.Gateway
 {
-    public class RpcServer<APPLICATION> : NetServer<APPLICATION, RpcSession>
-        where APPLICATION : IApplication, new()
+
+    public class RpcGatewayServer : NetServer<GatewayApplicatoin, RpcSession>
     {
         public string Host { get; set; }
 
@@ -24,16 +24,23 @@ namespace BeetleX.Ligth.gpRPC
 
         public string CertificateFile { get; set; }
 
+
+        public string UserName { get; set; }
+
+        public string Password { get; set; }
+
         public SslProtocols SslProtocols { get; set; } = SslProtocols.Tls11 | SslProtocols.Tls12 | SslProtocols.Tls13;
 
         public string CertificatePassword { get; set; }
+
+        internal uint ServerIdentifierSeed { get; set; } = 1000000000u;
 
         public override void Start()
         {
             RegisterMessages<RpcClient>();
             Options.SynchronousIO = false;
             Options.SessionSingleIOQueue = false;
-            Options.ServerName = "google protobuf rpc";
+            Options.ServerName = "google protobuf rpc gateway";
             Options.ReturnSendDelay = true;
             Options.SetDefaultListen(o =>
             {
@@ -59,7 +66,7 @@ namespace BeetleX.Ligth.gpRPC
             }
         }
 
-        private List<Type> _serviceTypes = new List<Type>();
+        private List<System.Type> _serviceTypes = new List<System.Type>();
 
         public void RegisterMessages<T>()
         {

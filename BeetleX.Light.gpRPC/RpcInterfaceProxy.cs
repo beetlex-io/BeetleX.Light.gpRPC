@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeetleX.Ligth.gpRPC
+namespace BeetleX.Light.gpRPC
 {
     public class RpcInterfaceProxy : DispatchProxy
     {

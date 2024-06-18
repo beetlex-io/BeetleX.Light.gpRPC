@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BeetleX.Light" Version="0.32.24.617" />
+    <PackageReference Include="BeetleX.Light" Version="0.33.24.618" />
     <PackageReference Include="Google.Protobuf" Version="3.27.1" />
     <PackageReference Include="Grpc.Tools" Version="2.64.0">
       <PrivateAssets>all</PrivateAssets>

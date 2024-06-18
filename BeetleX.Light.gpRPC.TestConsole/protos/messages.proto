@@ -1,6 +1,6 @@
 ﻿syntax = "proto3";
 
-option csharp_namespace = "BeetleX.Ligth.gpRPC.TestConsole";
+option csharp_namespace = "BeetleX.Light.gpRPC.TestConsole";
 
 message RegisterReq {
     uint32 Identifier=1;
