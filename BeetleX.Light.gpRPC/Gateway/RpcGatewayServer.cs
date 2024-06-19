@@ -64,7 +64,7 @@ namespace BeetleX.Light.gpRPC.Gateway
             base.Start();
             foreach (var t in _serviceTypes)
             {
-                RpcSession.MessageSessionHandlers.Default.Register(t, this);
+                MessageMethodHandlers.Default.Register(t, this);
             }
         }
 

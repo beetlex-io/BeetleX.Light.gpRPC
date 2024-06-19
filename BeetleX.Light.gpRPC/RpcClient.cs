@@ -1,6 +1,7 @@
 ﻿using BeetleX.Light.Clients;
 using BeetleX.Light.Protocols;
 using BeetleX.Light.gpRPC.Messages;
+using BeetleX.Light.Logs;
 using Google.Protobuf;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using BeetleX.Light.Dispatchs;
+using System.Collections;
 
 namespace BeetleX.Light.gpRPC
 {
@@ -101,9 +104,80 @@ namespace BeetleX.Light.gpRPC
             var resp = await Request<Success>(req);
         }
 
+        public override bool OnReceiveMessage(IAwaiterNetClient client, object msg)
+        {
+            if (msg is RpcMessage gpMsg)
+            {
+                var handler = MessageMethodHandlers.Default.GetMethod(gpMsg.Body.GetType());
+                if (handler != null)
+                {
+                    IOQueue queue;
+                    if (gpMsg.Body is IConsistency consistency)
+                    {
+                        queue = IOQueueFactory.Default.GetIOQueue(consistency.ConsistencyID);
+                    }
+                    else
+                    {
+                        queue = IOQueueFactory.Default.NextIOQueue();
+                    }
+                    MessageInvokdWork work = new MessageInvokdWork();
+                    work.Message = gpMsg;
+                    work.Client = this;
+                    work.Handler = handler;
+                    queue.Schedule(work);
+                    GetLoger(LogLevel.Debug)?.Write(this, "gpRPCClient", "Receive", $"Message schedule to {queue.ID}");
+                    return true;
+                }
+            }
+            return base.OnReceiveMessage(client, msg);
+        }
+
+        class MessageInvokdWork : IIOWork
+        {
+            public RpcMessage Message { get; set; }
+
+            public RpcClient Client { get; set; }
+
+            public MethodInvokeHandler Handler { get; set; }
+
+            public async Task Execute()
+            {
+
+                RpcMessage resp = new RpcMessage();
+                resp.Identifier = Message.Identifier;
+
+                try
+                {
+                    Task task = (Task)Handler.Method.Invoke(Handler.Service, new object[] { Message.Body });
+                    await task;
+                    var result = Handler.ResultProperty.GetValue(task);
+                    resp.Body = result;
+                    Client.GetLoger(LogLevel.Debug)?.Write(Client, "gpRPCClient", "InvokeSuccess", $"{Message.Body.GetType().Name}");
+
+                }
+                catch (Exception e_)
+                {
+                    Error error = new Error();
+                    error.ErrorCode = RpcException.METHOD_INVOKE_ERROR;
+                    error.ErrorMessage = e_.Message;
+                    error.StackTrace = e_.StackTrace;
+                    resp.Body = error;
+                    Client?.GetLoger(LogLevel.Error)?.Write(Client, "gpRPCClient", "InvokeError", $"{Message.Body.GetType().Name} invok error {e_.Message} {e_.StackTrace}!");
+                }
+
+                Client?.Send(resp);
+            }
+        }
+
+
         public void RegisterMessages<T>()
         {
             ProtocolMessageMapperFactory.UintMapper.RegisterAssembly<T>();
+            foreach (var type in typeof(T).Assembly.GetTypes())
+            {
+                if (type.GetCustomAttribute<RpcServiceAttribute>() != null)
+                    MessageMethodHandlers.Default.Register(type, this);
+            }
         }
         public T Create<T>()
         {

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace BeetleX.Light.gpRPC.Gateway
 {
     public class RpcGatewaySession : ISession
@@ -46,7 +47,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                 error.ErrorCode = RpcException.INVALID_CONNECTION;
                 error.ErrorMessage = "Invalid connection!";
                 resp.Body = error;
-                context.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Invoke", "Invalid connection");
+                context.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCGatewaySession", "Invoke", "Invalid connection");
                 NetContext?.Send(resp);
                 NetContext?.Dispose();
                 return Task.CompletedTask;
@@ -61,7 +62,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                     Authentication = AuthenticationType.Security;
                     Success success = new Success();
                     resp.Body = success;
-                    context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCSession", "Login", "Success");
+                    context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCGatewaySession", "Login", "Success");
                 }
                 else
                 {
@@ -69,7 +70,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                     error.ErrorCode = RpcException.INVALID_NAME_OR_PASSWORD;
                     error.ErrorMessage = "Invalid user name or password!";
                     resp.Body = error;
-                    context.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Login", error.ErrorMessage);
+                    context.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCGatewaySession", "Login", error.ErrorMessage);
                 }
 
                 NetContext?.Send(resp);
@@ -90,6 +91,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                         rpcmsg.Identifier = rpcmsg.Identifier | ((UInt64)gatewayID << 31);//增量网关处理ID
                         Server.SubcribeReplyTable.SetReplyContext(rpcmsg.Identifier, context);
                         subContext.Context.Send(rpcmsg);
+                        context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCGatewaySession", "Publish", $"{rpcmsg.Body.GetType().Name} message publish to {subContext.Context.RemotePoint.ToString()}");
                     }
                     else
                     {
@@ -100,6 +102,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                         error.ErrorMessage = "Service unavailable";
                         resp.Body = error;
                         context.Send(resp);
+                        context.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCGatewaySession", "Publish", $"{rpcmsg.Body.GetType().Name} message publish error service unavailable!");
                     }
                 }
                 else //订阅响应
@@ -109,7 +112,10 @@ namespace BeetleX.Light.gpRPC.Gateway
                     id = (id << 31) >> 31;//减去网关增量
                     rpcmsg.Identifier = id;
                     if (netContext != null)
+                    {
                         netContext.Send(rpcmsg);
+                        context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCGatewaySession", "Reply", $"{rpcmsg.Body.GetType().Name} message Reply to {netContext.RemotePoint.ToString()}");
+                    }
                 }
 
             }

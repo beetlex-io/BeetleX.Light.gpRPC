@@ -111,7 +111,7 @@ namespace BeetleX.Light.gpRPC
 
             RpcMessage resp = new RpcMessage();
             resp.Identifier = req.Identifier;
-            var method = MessageSessionHandlers.Default.GetMethod(req.Body.GetType());
+            var method = MessageMethodHandlers.Default.GetMethod(req.Body.GetType());
             if (method != null)
             {
                 try
@@ -155,67 +155,7 @@ namespace BeetleX.Light.gpRPC
 
         }
 
-        internal class MessageSessionHandlers
-        {
-            private Dictionary<Type, MethodInvokeHandler> _methods = new Dictionary<Type, MethodInvokeHandler>();
 
-            private static readonly MessageSessionHandlers _default = new MessageSessionHandlers();
-
-            public static MessageSessionHandlers Default => _default;
-
-            public MessageSessionHandlers()
-            {
-
-            }
-            public MethodInvokeHandler GetMethod(Type msgType)
-            {
-                _methods.TryGetValue(msgType, out var method);
-                return method;
-            }
-
-            public void Register(Type type, INetServer server)
-            {
-                var service = Activator.CreateInstance(type);
-                foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
-                {
-                    if (string.Compare("Equals", method.Name, true) == 0
-            || string.Compare("GetHashCode", method.Name, true) == 0
-            || string.Compare("GetType", method.Name, true) == 0
-            || string.Compare("ToString", method.Name, true) == 0 || method.Name.IndexOf("set_") >= 0
-            || method.Name.IndexOf("get_") >= 0 || method.GetParameters().Length != 1 ||
-            method.ReturnType.BaseType != typeof(Task))
-                        continue;
-                    var req = method.GetParameters()[0].ParameterType;
-                    var resp = method.ReturnType.GetGenericArguments()[0];
-                    if (resp.GetInterface("Google.Protobuf.IMessage") == null || req.GetInterface("Google.Protobuf.IMessage") == null)
-                        continue;
-                    server.GetLoger(LogLevel.Info)?.Write((EndPoint)null, "gpRPC", "ObjectMapping", $"{req.Name} mapping to {type.Name}.{method.Name}");
-                    var handler = new MethodInvokeHandler(method);
-                    handler.Service = service;
-                    _methods[req] = handler;
-                }
-            }
-
-        }
-
-        internal class MethodInvokeHandler
-        {
-            public MethodInvokeHandler(MethodInfo method)
-            {
-
-                ResultProperty = method.ReturnType.GetProperty("Result", BindingFlags.Public | BindingFlags.Instance);
-                Method = method;
-            }
-
-            public MethodInfo Method { get; set; }
-
-            public PropertyInfo ResultProperty
-            {
-                get; set;
-            }
-
-            public object Service { get; set; }
-        }
 
 
     }
