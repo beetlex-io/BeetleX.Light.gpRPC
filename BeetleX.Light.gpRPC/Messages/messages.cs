@@ -8,15 +8,27 @@ using System.Threading.Tasks;
 namespace BeetleX.Light.gpRPC.Messages
 {
     [ProtocolObject(2000000001u)]
+    public partial class Success
+    {
+
+    }
+
+    [ProtocolObject(2000000002u)]
     public partial class Error
     {
     }
-    [ProtocolObject(2000000002u)]
+
+
+    [ProtocolObject(2000000003u)]
     public partial class LoginReq
     {
     }
-    [ProtocolObject(2000000003u)]
-    public partial class LoginResp
+
+
+    [ProtocolObject(2000000004u)]
+    public partial class SubscribeReq
     {
     }
+
+
 }

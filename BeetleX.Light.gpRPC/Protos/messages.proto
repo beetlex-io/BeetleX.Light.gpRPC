@@ -13,10 +13,12 @@ message LoginReq{
    string Password=2;
 }
 
-message LoginResp{
-    string Rold=1;
-    bool Success=2;
-    string Token=3;
-    string ErrorMessage=4;
+
+message Success{
+
+}
+
+message SubscribeReq{
+    repeated uint32 Items=1;
 }
 

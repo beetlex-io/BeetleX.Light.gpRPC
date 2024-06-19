@@ -1,4 +1,5 @@
 ﻿using BeetleX.Light;
+using BeetleX.Light.Extension;
 using BeetleX.Light.Protocols;
 using Google.Protobuf.WellKnownTypes;
 using System;
@@ -24,16 +25,17 @@ namespace BeetleX.Light.gpRPC.Gateway
 
         public string CertificateFile { get; set; }
 
+        public string UserName { get; set; } = "admin";
 
-        public string UserName { get; set; }
-
-        public string Password { get; set; }
+        public string Password { get; set; } = "123456";
 
         public SslProtocols SslProtocols { get; set; } = SslProtocols.Tls11 | SslProtocols.Tls12 | SslProtocols.Tls13;
 
         public string CertificatePassword { get; set; }
 
-        internal uint ServerIdentifierSeed { get; set; } = 1000000000u;
+
+
+        internal SafeIdGenerator SafeIdGenerator { get; set; } = new SafeIdGenerator(1u, 200000000u);
 
         public override void Start()
         {
@@ -67,6 +69,10 @@ namespace BeetleX.Light.gpRPC.Gateway
         }
 
         private List<System.Type> _serviceTypes = new List<System.Type>();
+
+        internal MessageLoadBalancerFactory MessageLoadBalancerTable { get; set; } = new MessageLoadBalancerFactory();
+
+        internal SubcribeReplyFactory SubcribeReplyTable { get; set; } = new SubcribeReplyFactory();
 
         public void RegisterMessages<T>()
         {

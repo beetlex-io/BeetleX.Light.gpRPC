@@ -58,8 +58,8 @@ namespace BeetleX.Light.gpRPC.Gateway
                         var type = ProtocolMessageMapperFactory.UintMapper.ReadType(memory, reader.LittleEndian);
                         rpcMessage.Type = type.Value;
                         memory = memory.Slice(type.BuffersLength);
-                        rpcMessage.Identifier = memory.Span.ReadUInt32();
-                        memory = memory.Slice(4);
+                        rpcMessage.Identifier = memory.Span.ReadUInt64();
+                        memory = memory.Slice(8);
                         if (rpcMessage.Identifier < 2000000000u)
                         {
                             var data = MemoryPool<byte>.Shared.Rent(memory.Length);

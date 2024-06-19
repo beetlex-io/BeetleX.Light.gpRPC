@@ -11,7 +11,7 @@ namespace BeetleX.Light.gpRPC.Messages
     {
 
         public uint Type { get; set; }
-        public uint Identifier { get; set; }
+        public UInt64 Identifier { get; set; }
 
         public object Body { get; set; }
 

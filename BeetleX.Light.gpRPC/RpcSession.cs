@@ -26,12 +26,12 @@ namespace BeetleX.Light.gpRPC
 
         public NetContext NetContext { get; private set; }
 
-        public RpcServer RpcServer { get; internal set; }
+        public RpcServer Server { get; internal set; }
 
         public virtual void Connected(NetContext context)
         {
             NetContext = context;
-            RpcServer = (RpcServer)context.Server;
+            Server = (RpcServer)context.Server;
         }
 
         public virtual void Dispose(NetContext context)
@@ -49,29 +49,60 @@ namespace BeetleX.Light.gpRPC
 
             RpcMessage rpcmsg = (RpcMessage)message;
 
-            if (rpcmsg.Body is LoginReq req)
+            if (rpcmsg.Type == 2000000003u)
             {
+                LoginReq req = (LoginReq)rpcmsg.Body;
                 RpcMessage resp = new RpcMessage();
                 resp.Identifier = rpcmsg.Identifier;
-                LoginResp loginResp = new LoginResp();
-                if (req.UserName == RpcServer.UserName && req.Password == RpcServer.Password)
+
+                if (req.UserName == Server.UserName && req.Password == Server.Password)
                 {
-                    loginResp.Success = true;
+                    Authentication = AuthenticationType.Security;
+                    Success success = new Success();
+                    resp.Body = success;
                     context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCSession", "Login", "Success");
                 }
                 else
                 {
-                    loginResp.Success = false;
-                    loginResp.ErrorMessage = "Invalid user name or password!";
-                    context.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Login", loginResp.ErrorMessage);
+                    Error error = new Error();
+                    error.ErrorCode = RpcException.INVALID_NAME_OR_PASSWORD;
+                    error.ErrorMessage = "Invalid user name or password!";
+                    resp.Body = error;
+                    context.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Login", error.ErrorMessage);
                 }
-                resp.Body = loginResp;
+                NetContext?.Send(resp);
+                return Task.CompletedTask;
+            }
+            else if (rpcmsg.Type == 2000000004u)
+            {
+                RpcMessage resp = new RpcMessage();
+                resp.Identifier = rpcmsg.Identifier;
+                Error error = new Error();
+                error.ErrorCode = RpcException.SUBSCRIBER_NOT_SUPPORT;
+                error.ErrorMessage = "Not support!";
+                resp.Body = error;
                 NetContext?.Send(resp);
                 return Task.CompletedTask;
             }
             else
             {
-                return OnReceiveMessage(rpcmsg);
+                if (Authentication != AuthenticationType.Security)
+                {
+                    RpcMessage resp = new RpcMessage();
+                    resp.Identifier = rpcmsg.Identifier;
+                    Error error = new Error();
+                    error.ErrorCode = RpcException.INVALID_CONNECTION;
+                    error.ErrorMessage = "Invalid connection!";
+                    resp.Body = error;
+                    NetContext?.Send(resp);
+                    NetContext?.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Invoke", "Invalid connection");
+                    NetContext?.Dispose();
+                    return Task.CompletedTask;
+                }
+                else
+                {
+                    return OnReceiveMessage(rpcmsg);
+                }
             }
         }
 
@@ -95,6 +126,7 @@ namespace BeetleX.Light.gpRPC
                 catch (Exception e_)
                 {
                     Error error = new Error();
+                    error.ErrorCode = RpcException.METHOD_INVOKE_ERROR;
                     error.ErrorMessage = e_.Message;
                     error.StackTrace = e_.StackTrace;
                     resp.Body = error;
@@ -105,6 +137,7 @@ namespace BeetleX.Light.gpRPC
             else
             {
                 Error error = new Error();
+                error.ErrorCode = RpcException.METHOD_NOTFOUND;
                 error.ErrorMessage = $"{req.Body.GetType().Name} handler not found!";
                 resp.Body = error;
                 NetContext?.GetLoger(LogLevel.Warring)?.Write(NetContext, "gpRPCSession", "InvokeError", $"{req.Body.GetType().Name} handler not found!");

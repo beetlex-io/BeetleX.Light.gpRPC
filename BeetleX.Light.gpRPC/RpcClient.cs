@@ -39,33 +39,66 @@ namespace BeetleX.Light.gpRPC
             return NetClient;
         }
 
-        public async Task<object> Request(IMessage message)
+        internal async Task<object> Request(IMessage message)
         {
             RpcMessage req = new RpcMessage();
             req.Body = message;
             var result = (RpcMessage)await ((IAwaiterNetClient)this).Request(req);
             if (result.Body is Error err)
             {
-                throw new Exception(err.ErrorMessage);
+                throw new RpcException(err);
             }
             return result.Body;
         }
-        public async Task<RESP> Request<RESP>(IMessage message)
+        internal async Task<RESP> Request<RESP>(IMessage message)
             where RESP : IMessage
         {
             return (RESP)await Request(message);
         }
 
+        public Task Subscribe<T>()
+        {
+            return Subscribe(typeof(T));
+        }
+
+        public Task Subscribe<T, T1>()
+        {
+            return Subscribe(typeof(T), typeof(T1));
+        }
+
+        public Task Subscribe<T, T1, T2>()
+        {
+            return Subscribe(typeof(T), typeof(T1), typeof(T2));
+        }
+
+        public Task Subscribe<T, T1, T2, T3>()
+        {
+            return Subscribe(typeof(T), typeof(T1), typeof(T2), typeof(T3));
+        }
+        public Task Subscribe<T, T1, T2, T3, T4>()
+        {
+            return Subscribe(typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+
+        }
+
+        public async Task Subscribe(params Type[] types)
+        {
+            SubscribeReq req = new SubscribeReq();
+            foreach (var item in types)
+            {
+                req.Items.Add(ProtocolMessageMapperFactory.UintMapper.GetTypeValue(item));
+            }
+            await Request(req);
+        }
+
         private async Task OnConnect(NetClient client)
         {
             LoginReq req = new LoginReq();
-            if(!string.IsNullOrEmpty(Password))
+            if (!string.IsNullOrEmpty(Password))
                 req.Password = Password;
             if (!string.IsNullOrEmpty(UserName))
                 req.UserName = UserName;
-            var resp = await Request<LoginResp>(req);
-            if (!resp.Success)
-                throw new BXException(resp.ErrorMessage);
+            var resp = await Request<Success>(req);
         }
 
         public void RegisterMessages<T>()

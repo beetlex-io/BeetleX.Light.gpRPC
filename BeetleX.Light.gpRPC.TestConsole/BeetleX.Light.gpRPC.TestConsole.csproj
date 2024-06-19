@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BeetleX.Light" Version="0.33.24.618" />
     <PackageReference Include="Grpc.Tools" Version="2.64.0" PrivateAssets="All">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

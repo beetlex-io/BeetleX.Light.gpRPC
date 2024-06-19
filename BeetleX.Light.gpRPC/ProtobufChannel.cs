@@ -46,8 +46,8 @@ namespace BeetleX.Light.gpRPC
                         var type = ProtocolMessageMapperFactory.UintMapper.ReadType(memory, reader.LittleEndian);
                         rpcMessage.Type = type.Value;
                         memory = memory.Slice(type.BuffersLength);
-                        rpcMessage.Identifier = memory.Span.ReadUInt32();
-                        memory = memory.Slice(4);
+                        rpcMessage.Identifier = memory.Span.ReadUInt64();
+                        memory = memory.Slice(8);
                         IMessage message = (IMessage)Activator.CreateInstance(type.MessageType);
                         message.MergeFrom(memory.Span);
                         rpcMessage.Body = message;
