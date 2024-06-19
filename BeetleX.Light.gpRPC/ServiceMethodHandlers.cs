@@ -9,15 +9,15 @@ using System.Threading.Tasks;
 
 namespace BeetleX.Light.gpRPC
 {
-    internal class MessageMethodHandlers
+    internal class ServiceMethodHandlers
     {
         private Dictionary<Type, MethodInvokeHandler> _methods = new Dictionary<Type, MethodInvokeHandler>();
 
-        private static readonly MessageMethodHandlers _default = new MessageMethodHandlers();
+        private static readonly ServiceMethodHandlers _default = new ServiceMethodHandlers();
 
-        public static MessageMethodHandlers Default => _default;
+        public static ServiceMethodHandlers Default => _default;
 
-        public MessageMethodHandlers()
+        public ServiceMethodHandlers()
         {
 
         }

@@ -108,7 +108,7 @@ namespace BeetleX.Light.gpRPC
         {
             if (msg is RpcMessage gpMsg)
             {
-                var handler = MessageMethodHandlers.Default.GetMethod(gpMsg.Body.GetType());
+                var handler = ServiceMethodHandlers.Default.GetMethod(gpMsg.Body.GetType());
                 if (handler != null)
                 {
                     IOQueue queue;
@@ -176,7 +176,7 @@ namespace BeetleX.Light.gpRPC
             foreach (var type in typeof(T).Assembly.GetTypes())
             {
                 if (type.GetCustomAttribute<RpcServiceAttribute>() != null)
-                    MessageMethodHandlers.Default.Register(type, this);
+                    ServiceMethodHandlers.Default.Register(type, this);
             }
         }
         public T Create<T>()

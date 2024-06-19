@@ -28,6 +28,8 @@ namespace BeetleX.Light.gpRPC
 
         public RpcServer Server { get; internal set; }
 
+        public User User { get; internal set; }
+
         public virtual void Connected(NetContext context)
         {
             NetContext = context;
@@ -54,9 +56,10 @@ namespace BeetleX.Light.gpRPC
                 LoginReq req = (LoginReq)rpcmsg.Body;
                 RpcMessage resp = new RpcMessage();
                 resp.Identifier = rpcmsg.Identifier;
-
-                if (req.UserName == Server.UserName && req.Password == Server.Password)
+                var user = Server.UserManager.GetUser(req.UserName);
+                if (user != null && req.Password == user.Password)
                 {
+                    User = user;
                     Authentication = AuthenticationType.Security;
                     Success success = new Success();
                     resp.Body = success;
@@ -86,7 +89,7 @@ namespace BeetleX.Light.gpRPC
             }
             else
             {
-                if (Authentication != AuthenticationType.Security)
+                if (User == null || !User.Check(rpcmsg.Type))
                 {
                     RpcMessage resp = new RpcMessage();
                     resp.Identifier = rpcmsg.Identifier;
@@ -111,7 +114,7 @@ namespace BeetleX.Light.gpRPC
 
             RpcMessage resp = new RpcMessage();
             resp.Identifier = req.Identifier;
-            var method = MessageMethodHandlers.Default.GetMethod(req.Body.GetType());
+            var method = ServiceMethodHandlers.Default.GetMethod(req.Body.GetType());
             if (method != null)
             {
                 try
