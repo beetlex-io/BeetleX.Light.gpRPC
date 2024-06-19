@@ -46,68 +46,81 @@ namespace BeetleX.Light.gpRPC
             NetContext.Send(message);
         }
 
-        public Task Receive(NetContext context, object message)
+        private void OnLogin(RpcMessage rpcmsg)
         {
-
-            RpcMessage rpcmsg = (RpcMessage)message;
-
-            if (rpcmsg.Type == 2000000003u)
+            LoginReq req = (LoginReq)rpcmsg.Body;
+            RpcMessage resp = new RpcMessage();
+            resp.Identifier = rpcmsg.Identifier;
+            var user = Server.UserManager.GetUser(req.UserName);
+            if (user != null && req.Password == user.Password)
             {
-                LoginReq req = (LoginReq)rpcmsg.Body;
-                RpcMessage resp = new RpcMessage();
-                resp.Identifier = rpcmsg.Identifier;
-                var user = Server.UserManager.GetUser(req.UserName);
-                if (user != null && req.Password == user.Password)
-                {
-                    User = user;
-                    Authentication = AuthenticationType.Security;
-                    Success success = new Success();
-                    resp.Body = success;
-                    context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCSession", "Login", "Success");
-                }
-                else
-                {
-                    Error error = new Error();
-                    error.ErrorCode = RpcException.INVALID_NAME_OR_PASSWORD;
-                    error.ErrorMessage = "Invalid user name or password!";
-                    resp.Body = error;
-                    context.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Login", error.ErrorMessage);
-                }
-                NetContext?.Send(resp);
-                return Task.CompletedTask;
-            }
-            else if (rpcmsg.Type == 2000000004u)
-            {
-                RpcMessage resp = new RpcMessage();
-                resp.Identifier = rpcmsg.Identifier;
-                Error error = new Error();
-                error.ErrorCode = RpcException.SUBSCRIBER_NOT_SUPPORT;
-                error.ErrorMessage = "Not support!";
-                resp.Body = error;
-                NetContext?.Send(resp);
-                return Task.CompletedTask;
+                User = user;
+                Authentication = AuthenticationType.Security;
+                Success success = new Success();
+                resp.Body = success;
+                NetContext.GetLoger(LogLevel.Debug)?.Write(NetContext, "gpRPCSession", "Login", "Success");
             }
             else
             {
-                if (User == null || !User.Check(rpcmsg.Type))
-                {
-                    RpcMessage resp = new RpcMessage();
-                    resp.Identifier = rpcmsg.Identifier;
-                    Error error = new Error();
-                    error.ErrorCode = RpcException.INVALID_CONNECTION;
-                    error.ErrorMessage = "Invalid connection!";
-                    resp.Body = error;
-                    NetContext?.Send(resp);
-                    NetContext?.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Invoke", "Invalid connection");
-                    NetContext?.Dispose();
-                    return Task.CompletedTask;
-                }
-                else
-                {
-                    return OnReceiveMessage(rpcmsg);
-                }
+                Error error = new Error();
+                error.ErrorCode = RpcException.INVALID_NAME_OR_PASSWORD;
+                error.ErrorMessage = "Invalid user name or password!";
+                resp.Body = error;
+                NetContext.GetLoger(LogLevel.Warring)?.Write(NetContext, "gpRPCSession", "Login", error.ErrorMessage);
             }
+            NetContext?.Send(resp);
         }
+
+public Task Receive(NetContext context, object message)
+{
+
+    RpcMessage rpcmsg = (RpcMessage)message;
+    if (rpcmsg.Type == 2000000003u)
+    {
+        OnLogin(rpcmsg);
+        return Task.CompletedTask;
+    }
+    else if (rpcmsg.Type == 2000000004u)
+    {
+        RpcMessage resp = new RpcMessage();
+        resp.Identifier = rpcmsg.Identifier;
+        Error error = new Error();
+        error.ErrorCode = RpcException.SUBSCRIBER_NOT_SUPPORT;
+        error.ErrorMessage = "Not support!";
+        resp.Body = error;
+        NetContext?.Send(resp);
+        return Task.CompletedTask;
+    }
+    else
+    {
+        if (User == null || !User.Check(rpcmsg.Type))
+        {
+            RpcMessage resp = new RpcMessage();
+            resp.Identifier = rpcmsg.Identifier;
+            Error error = new Error();
+            if (User == null)
+            {
+                error.ErrorCode = RpcException.INVALID_CONNECTION;
+                error.ErrorMessage = "Invalid connection!";
+                NetContext?.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Invoke", "Invalid connection");
+            }
+            else
+            {
+                error.ErrorCode = RpcException.PERMISSION_UNAVAILABLE;
+                error.ErrorMessage = "Permission unavailable!";
+                NetContext?.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Invoke", "Permission unavailable");
+            }
+            resp.Body = error;
+            NetContext?.Send(resp);
+            NetContext?.Dispose();
+            return Task.CompletedTask;
+        }
+        else
+        {
+            return OnReceiveMessage(rpcmsg);
+        }
+    }
+}
 
         protected virtual async Task OnReceiveMessage(RpcMessage req)
         {

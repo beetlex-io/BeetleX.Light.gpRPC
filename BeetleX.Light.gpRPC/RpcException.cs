@@ -30,6 +30,9 @@ namespace BeetleX.Light.gpRPC
 
 
         public const uint SERVICE_UNAVAILABLE = 0X007;
+
+        public const uint PERMISSION_UNAVAILABLE = 0X008;
+
         public uint ErrorCode { get; private set; }
         public RpcException(string message) : base(message) { }
 

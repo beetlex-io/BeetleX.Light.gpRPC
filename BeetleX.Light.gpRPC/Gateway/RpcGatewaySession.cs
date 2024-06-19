@@ -21,6 +21,8 @@ namespace BeetleX.Light.gpRPC.Gateway
 
         public GatewayApplicatoin Application { get; set; }
 
+        public User User { get; private set; }
+
         public void Connected(NetContext context)
         {
             this.Server = (RpcGatewayServer)context.Server;
@@ -31,6 +33,7 @@ namespace BeetleX.Light.gpRPC.Gateway
         {
             Server.MessageLoadBalancerTable.Remove(context);
         }
+
 
 
 
@@ -57,8 +60,10 @@ namespace BeetleX.Light.gpRPC.Gateway
                 LoginReq req = (LoginReq)rpcmsg.Body;
                 RpcMessage resp = new RpcMessage();
                 resp.Identifier = rpcmsg.Identifier;
-                if (req.UserName == Server.UserName && req.Password == Server.Password)
+                var user = Server.UserManager.GetUser(req.UserName);
+                if (user != null && req.Password == user.Password)
                 {
+                    User = user;
                     Authentication = AuthenticationType.Security;
                     Success success = new Success();
                     resp.Body = success;
@@ -82,6 +87,29 @@ namespace BeetleX.Light.gpRPC.Gateway
             }
             else
             {
+                if (User == null || !User.Check(rpcmsg.Type))
+                {
+                    RpcMessage resp = new RpcMessage();
+                    resp.Identifier = rpcmsg.Identifier;
+                    Error error = new Error();
+                    if (User == null)
+                    {
+                        error.ErrorCode = RpcException.INVALID_CONNECTION;
+                        error.ErrorMessage = "Invalid connection!";
+                        NetContext?.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCGatewaySession", "Invoke", "Invalid connection");
+                    }
+                    else
+                    {
+                        error.ErrorCode = RpcException.PERMISSION_UNAVAILABLE;
+                        error.ErrorMessage = "Invalid connection!";
+                        NetContext?.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCGatewaySession", "Invoke", "Permission unavailable");
+                    }
+                    resp.Body = error;
+                    NetContext?.Send(resp);
+
+                    NetContext?.Dispose();
+                    return Task.CompletedTask;
+                }
                 if (rpcmsg.Identifier < UInt32.MaxValue)//推送消息
                 {
                     var gatewayID = Server.SafeIdGenerator.GetNextId();
@@ -130,15 +158,26 @@ namespace BeetleX.Light.gpRPC.Gateway
             resp.Identifier = rpcmsg.Identifier;
             try
             {
+                if (User == null)
+                    throw new RpcException("Invalid connection");
+                foreach (var item in req.Items)
+                {
+                    if (!User.Check(item))
+                    {
+                        throw new RpcException("Permission unavailable");
+                    }
+
+                }
                 foreach (var item in req.Items)
                 {
                     Server.MessageLoadBalancerTable.Add(item, NetContext);
+                    NetContext.GetLoger(LogLevel.Debug)?.Write(NetContext, "gpRPCGatewaySession", "Subscribe", $"{item}");
                 }
                 resp.Body = new Success();
             }
             catch (Exception e_)
             {
-                NetContext.GetLoger(LogLevel.Warring)?.WriteException(NetContext, "gpRPCSession", "Subscribe", e_);
+                NetContext.GetLoger(LogLevel.Warring)?.WriteException(NetContext, "gpRPCGatewaySession", "Subscribe", e_);
                 Error error = new Error();
                 error.ErrorCode = RpcException.SUBSCRIBER_ERROR;
                 error.ErrorMessage = e_.Message;

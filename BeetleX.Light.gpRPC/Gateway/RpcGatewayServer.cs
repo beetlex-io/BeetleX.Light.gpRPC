@@ -25,9 +25,7 @@ namespace BeetleX.Light.gpRPC.Gateway
 
         public string CertificateFile { get; set; }
 
-        public string UserName { get; set; } = "admin";
-
-        public string Password { get; set; } = "123456";
+        public UserManager UserManager { get; private set; } = new UserManager();
 
         public SslProtocols SslProtocols { get; set; } = SslProtocols.Tls11 | SslProtocols.Tls12 | SslProtocols.Tls13;
 

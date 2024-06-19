@@ -34,7 +34,7 @@ namespace BeetleX.Light.gpRPC
             RegisterMessages<RpcClient>();
             Options.SynchronousIO = false;
             Options.SessionSingleIOQueue = false;
-            Options.ServerName = "google protobuf rpc";
+            Options.ServerName = "google protobuf rpc server";
             Options.ReturnSendDelay = true;
             Options.SetDefaultListen(o =>
             {
@@ -44,12 +44,12 @@ namespace BeetleX.Light.gpRPC
             });
             if (!string.IsNullOrEmpty(CertificateFile))
             {
-                Options.SetListen("ssl", o =>
+                Options.SetListen("tls", o =>
                 {
                     o.Host = TLSHost;
                     o.Port = TLSPort;
                     o.EnabledSSL(CertificateFile, CertificatePassword,
-                       SslProtocols);
+                        SslProtocols);
                     o.SetProtocolChannel<ProtobufChannel<NetContext>>();
                 });
             }

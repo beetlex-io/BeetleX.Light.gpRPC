@@ -11,6 +11,8 @@ server.CertificatePassword = "12345678";
 server.RegisterMessages<RegisterReq>();
 server.Options.AddLogOutputHandler<LogOutputToConsole>();
 server.Options.LogLevel = LogLevel.Trace;
+server.UserManager.GetUser("admin")
+    .SetRight<RegisterReq>();
 server.Start();
 await Task.Delay(3000);
 
@@ -31,6 +33,10 @@ req.LastName = $"henry";
 req.Password = "122";
 var resp = await handler.Register(req);
 
+UsersReq usersreq = new UsersReq();
+usersreq.Count = 5;
+await handler.Users(usersreq);
+
 await server.Debug();
 
 [RpcService]
@@ -49,7 +55,7 @@ public class UserHandler : IUserHandler
         UsersResp resp = new UsersResp();
         for (int i = 0; i < req.Count; i++)
         {
-            User user = new User();
+            BeetleX.Light.gpRPC.TestConsole.User user = new BeetleX.Light.gpRPC.TestConsole.User();
             user.Address = $"guangzhouLongdong{i}";
             user.City = $"guzngzhou{i}";
             user.Email = "henryfan@msn.com";
