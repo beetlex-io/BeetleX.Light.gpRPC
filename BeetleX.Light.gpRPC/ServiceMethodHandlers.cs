@@ -27,18 +27,18 @@ namespace BeetleX.Light.gpRPC
             return method;
         }
 
-        public Func<Type, object> ServiceInstanceHandler { get; set; }
+        public Func<Type, object> ServiceCreateInstanceHandler { get; set; }
 
-        private object CreateInstance(Type type)
+        private object ServiceCreateInstance(Type type)
         {
-            if (ServiceInstanceHandler != null)
-                return ServiceInstanceHandler(type);
+            if (ServiceCreateInstanceHandler != null)
+                return ServiceCreateInstanceHandler(type);
             return Activator.CreateInstance(type);
         }
 
         public void Register(Type type, IGetLogHandler loger)
         {
-            var service = CreateInstance(type);
+            var service = ServiceCreateInstance(type);
             Type gtask = Type.GetType("System.Threading.Tasks.Task`1");
             foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
             {

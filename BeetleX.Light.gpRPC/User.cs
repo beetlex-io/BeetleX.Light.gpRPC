@@ -8,38 +8,55 @@ using System.Threading.Tasks;
 
 namespace BeetleX.Light.gpRPC
 {
-public class User
-{
-    public string Name { get; set; }
-
-    public string Password { get; set; }
-
-    private Dictionary<uint, uint> _right = new Dictionary<uint, uint>();
-
-    public bool Check(uint messageType)
+    public class User
     {
-        if (_right.Count == 0)
-            return true;
-        return _right.ContainsKey(messageType);
-    }
+        public string Name { get; set; }
+
+        public string Password { get; set; }
+
+        private Dictionary<uint, uint> _whitelist = new Dictionary<uint, uint>();
+
+        private Dictionary<uint, uint> _blacklist = new Dictionary<uint, uint>();
+
+        public bool Check(uint messageType)
+        {
+            if (_right.Count == 0)
+                return true;
+            return _right.ContainsKey(messageType);
+        }
 
 
-    public override bool Equals(object? obj)
-    {
-        return this.Name.ToLower() == ((User)obj).Name.ToLower();
-    }
+        public override bool Equals(object? obj)
+        {
+            return this.Name.ToLower() == ((User)obj).Name.ToLower();
+        }
 
-    public User SetRight<T>()
-        where T : IMessage
-    {
-        var value = ProtocolMessageMapperFactory.UintMapper.GetTypeValue(typeof(T));
-        return SetRight(value);
+        public User SetWhite<T>()
+            where T : IMessage
+        {
+            var value = ProtocolMessageMapperFactory.UintMapper.GetTypeValue(typeof(T));
+            return SetWhite(value);
+
+        }
+        public User SetWhite(uint messageType)
+        {
+            _whitelist[messageType] = messageType;
+            return this;
+        }
+
+        public User SetBlack<T>()
+           where T : IMessage
+        {
+            var value = ProtocolMessageMapperFactory.UintMapper.GetTypeValue(typeof(T));
+            return SetBlack(value);
+
+        }
+        public User SetBlack(uint messageType)
+        {
+            _blacklist[messageType] = messageType;
+            return this;
+        }
+
 
     }
-    public User SetRight(uint messageType)
-    {
-        _right[messageType] = messageType;
-        return this;
-    }
-}
 }
