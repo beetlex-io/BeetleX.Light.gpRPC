@@ -16,3 +16,8 @@ BeetleX.Light.gpRPC.TestConsole/bin/
 BeetleX.Light.gpRPC.TestConsole/obj/
 BeetleX.Light.gpRPC/bin/
 BeetleX.Light.gpRPC/obj/
+Getaway/gpRPC.Gateway.Messages/obj/
+Getaway/gpRPC.Gateway.Publish/obj/gpRPC.Gateway.Publish.csproj.nuget.dgspec.json
+Getaway/gpRPC.Gateway.Publish/obj/
+Getaway/gpRPC.Gateway.Subscriber/obj/
+gpRPC.Gateway.Server/obj/
