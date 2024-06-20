@@ -11,8 +11,8 @@ server.CertificatePassword = "12345678";
 server.RegisterMessages<RegisterReq>();
 server.Options.AddLogOutputHandler<LogOutputToConsole>();
 server.Options.LogLevel = LogLevel.Trace;
-server.UserManager.GetUser("admin")
-    .SetRight<RegisterReq>();
+//server.UserManager.GetUser("admin")
+//    .SetRight<RegisterReq>();
 server.Start();
 await Task.Delay(3000);
 
@@ -31,12 +31,16 @@ req.Email = "henryfan@msn.com";
 req.FirstName = $"fan";
 req.LastName = $"henry";
 req.Password = "122";
-var resp = await handler.Register(req);
-
-UsersReq usersreq = new UsersReq();
-usersreq.Count = 5;
-await handler.Users(usersreq);
-
+//var resp = await handler.Register(req);
+//client.GetLoger(LogLevel.Info)?.Write(client, "Service", "Invoke", "Register completed");
+//UsersReq usersreq = new UsersReq();
+//usersreq.Count = 5;
+//await handler.Users(usersreq);
+//client.GetLoger(LogLevel.Info)?.Write(client, "Service", "Invoke", "Users completed");
+SetTimeReq setTimeReq = new SetTimeReq();
+setTimeReq.Time = DateTime.Now.Ticks;
+await handler.SetTime(setTimeReq);
+client.GetLoger(LogLevel.Info)?.Write(client, "Service", "Invoke", "SetTime completed");
 await server.Debug();
 
 [RpcService]
@@ -48,6 +52,11 @@ public class UserHandler : IUserHandler
         resp.Success = true;
         resp.Time = DateTime.Now.Ticks;
         return resp;
+    }
+
+    public Task SetTime(SetTimeReq req)
+    {
+        return Task.CompletedTask;
     }
 
     public async Task<UsersResp> Users(UsersReq req)

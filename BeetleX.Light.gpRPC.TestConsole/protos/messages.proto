@@ -39,3 +39,6 @@ message UsersResp{
      bool Success=3;
      string Error=4;
 }
+message SetTimeReq{
+    int64 Time=1;
+}

@@ -31,10 +31,18 @@ namespace BeetleX.Light.gpRPC.TestConsole
 
     }
 
+    [ProtocolObject(203u)]
+    public partial class SetTimeReq
+    {
+
+    }
+
     public interface IUserHandler
     {
         Task<RegisterResp> Register(RegisterReq req);
 
         Task<UsersResp> Users(UsersReq req);
+
+        Task SetTime(SetTimeReq req);
     }
 }

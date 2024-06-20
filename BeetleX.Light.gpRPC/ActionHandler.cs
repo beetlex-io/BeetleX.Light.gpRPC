@@ -14,8 +14,15 @@ namespace BeetleX.Light.gpRPC
         {
             this.MethodInfo = method;
 
-            ResultType = method.ReturnType.GetGenericArguments()[0];
-            PropertyInfo pi = method.ReturnType.GetProperty("Result", BindingFlags.Public | BindingFlags.Instance);
+            if (method.ReturnType.IsGenericType)
+            {
+                ResultType = method.ReturnType.GetGenericArguments()[0];
+                PropertyInfo pi = method.ReturnType.GetProperty("Result", BindingFlags.Public | BindingFlags.Instance);
+            }
+            else
+            {
+                ResultType = typeof(object);
+            }
 
         }
 

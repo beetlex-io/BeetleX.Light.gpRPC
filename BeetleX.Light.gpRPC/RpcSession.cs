@@ -71,56 +71,56 @@ namespace BeetleX.Light.gpRPC
             NetContext?.Send(resp);
         }
 
-public Task Receive(NetContext context, object message)
-{
-
-    RpcMessage rpcmsg = (RpcMessage)message;
-    if (rpcmsg.Type == 2000000003u)
-    {
-        OnLogin(rpcmsg);
-        return Task.CompletedTask;
-    }
-    else if (rpcmsg.Type == 2000000004u)
-    {
-        RpcMessage resp = new RpcMessage();
-        resp.Identifier = rpcmsg.Identifier;
-        Error error = new Error();
-        error.ErrorCode = RpcException.SUBSCRIBER_NOT_SUPPORT;
-        error.ErrorMessage = "Not support!";
-        resp.Body = error;
-        NetContext?.Send(resp);
-        return Task.CompletedTask;
-    }
-    else
-    {
-        if (User == null || !User.Check(rpcmsg.Type))
+        public Task Receive(NetContext context, object message)
         {
-            RpcMessage resp = new RpcMessage();
-            resp.Identifier = rpcmsg.Identifier;
-            Error error = new Error();
-            if (User == null)
+
+            RpcMessage rpcmsg = (RpcMessage)message;
+            if (rpcmsg.Type == 2000000003u)
             {
-                error.ErrorCode = RpcException.INVALID_CONNECTION;
-                error.ErrorMessage = "Invalid connection!";
-                NetContext?.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Invoke", "Invalid connection");
+                OnLogin(rpcmsg);
+                return Task.CompletedTask;
+            }
+            else if (rpcmsg.Type == 2000000004u)
+            {
+                RpcMessage resp = new RpcMessage();
+                resp.Identifier = rpcmsg.Identifier;
+                Error error = new Error();
+                error.ErrorCode = RpcException.SUBSCRIBER_NOT_SUPPORT;
+                error.ErrorMessage = "Not support!";
+                resp.Body = error;
+                NetContext?.Send(resp);
+                return Task.CompletedTask;
             }
             else
             {
-                error.ErrorCode = RpcException.PERMISSION_UNAVAILABLE;
-                error.ErrorMessage = "Permission unavailable!";
-                NetContext?.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Invoke", "Permission unavailable");
+                if (User == null || !User.Check(rpcmsg.Type))
+                {
+                    RpcMessage resp = new RpcMessage();
+                    resp.Identifier = rpcmsg.Identifier;
+                    Error error = new Error();
+                    if (User == null)
+                    {
+                        error.ErrorCode = RpcException.INVALID_CONNECTION;
+                        error.ErrorMessage = "Invalid connection!";
+                        NetContext?.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Invoke", "Invalid connection");
+                    }
+                    else
+                    {
+                        error.ErrorCode = RpcException.PERMISSION_UNAVAILABLE;
+                        error.ErrorMessage = "Permission unavailable!";
+                        NetContext?.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCSession", "Invoke", "Permission unavailable");
+                    }
+                    resp.Body = error;
+                    NetContext?.Send(resp);
+                    NetContext?.Dispose();
+                    return Task.CompletedTask;
+                }
+                else
+                {
+                    return OnReceiveMessage(rpcmsg);
+                }
             }
-            resp.Body = error;
-            NetContext?.Send(resp);
-            NetContext?.Dispose();
-            return Task.CompletedTask;
         }
-        else
-        {
-            return OnReceiveMessage(rpcmsg);
-        }
-    }
-}
 
         protected virtual async Task OnReceiveMessage(RpcMessage req)
         {
@@ -134,8 +134,16 @@ public Task Receive(NetContext context, object message)
                 {
                     Task task = (Task)method.Method.Invoke(method.Service, new object[] { req.Body });
                     await task;
-                    var result = method.ResultProperty.GetValue(task);
-                    resp.Body = result;
+                    if (method.ResultProperty != null)
+                    {
+                        var result = method.ResultProperty.GetValue(task);
+                        resp.Body = result;
+                    }
+                    else
+                    {
+                        Success success = new Success();
+                        resp.Body = success;
+                    }
                     NetContext.GetLoger(LogLevel.Debug)?.Write(NetContext, "gpRPCSession", "InvokeSuccess", $"{req.Body.GetType().Name}");
 
                 }

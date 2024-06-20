@@ -49,7 +49,7 @@ namespace BeetleX.Light.gpRPC
             var result = (RpcMessage)await ((IAwaiterNetClient)this).Request(req);
             if (result.Body is Error err)
             {
-                throw new RpcException(err);
+                throw new RpcException( $"{message.GetType().Name} remote invoke error {err.ErrorMessage}");
             }
             return result.Body;
         }

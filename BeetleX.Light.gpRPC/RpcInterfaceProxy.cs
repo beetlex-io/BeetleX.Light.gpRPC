@@ -41,6 +41,7 @@ namespace BeetleX.Light.gpRPC
         internal void InitHandlers()
         {
             Type type = Type;
+            Type gtask = Type.GetType("System.Threading.Tasks.Task`1");
             foreach (MethodInfo method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
             {
                 if (string.Compare("Equals", method.Name, true) == 0
@@ -48,14 +49,19 @@ namespace BeetleX.Light.gpRPC
               || string.Compare("GetType", method.Name, true) == 0
               || string.Compare("ToString", method.Name, true) == 0 || method.Name.IndexOf("set_") >= 0
               || method.Name.IndexOf("get_") >= 0 || method.GetParameters().Length != 1 ||
-              method.ReturnType.BaseType != typeof(Task))
+              (method.ReturnType.Name != "Task`1" && method.ReturnType != typeof(Task)))
                     continue;
                 var req = method.GetParameters()[0].ParameterType;
-                var resp = method.ReturnType.GetGenericArguments()[0];
-                if (resp.GetInterface("Google.Protobuf.IMessage") == null || req.GetInterface("Google.Protobuf.IMessage") == null)
-                    continue;
-                ActionHandler action = new ActionHandler(method);
-                mHandlers[req] = action;
+                Type resp = null;
+                if (method.ReturnType.IsGenericType)
+                {
+                    resp = method.ReturnType.GetGenericArguments()[0];
+                }
+                if (req.GetInterface("Google.Protobuf.IMessage") != null && (method.ReturnType == typeof(Task) || resp?.GetInterface("Google.Protobuf.IMessage") != null))
+                {
+                    ActionHandler action = new ActionHandler(method);
+                    mHandlers[req] = action;
+                }
 
             }
         }
