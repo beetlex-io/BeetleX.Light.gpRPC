@@ -11,8 +11,10 @@ server.CertificatePassword = "12345678";
 server.RegisterMessages<RegisterReq>();
 server.Options.AddLogOutputHandler<LogOutputToConsole>();
 server.Options.LogLevel = LogLevel.Trace;
-//server.UserManager.GetUser("admin")
-//    .SetRight<RegisterReq>();
+server.UserManager.GetUser("admin")
+    .SetWhite<RegisterReq>().SetWhite<SetTimeReq>();
+server.UserManager.Create("herny", "123456")
+    .SetBlack<RegisterReq>();
 server.Start();
 await Task.Delay(3000);
 

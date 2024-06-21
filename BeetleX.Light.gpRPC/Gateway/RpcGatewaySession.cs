@@ -26,6 +26,7 @@ namespace BeetleX.Light.gpRPC.Gateway
         public void Connected(NetContext context)
         {
             this.Server = (RpcGatewayServer)context.Server;
+            NetContext = context;
             this.Application = (GatewayApplicatoin)context.Server.Application;
         }
 
@@ -164,7 +165,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                 {
                     if (!User.Check(item))
                     {
-                        throw new RpcException("Permission unavailable");
+                        throw new RpcException($"Subscribe {item} permission unavailable!");
                     }
 
                 }

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace BeetleX.Light.gpRPC.Gateway
 {
 
-    public class RpcGatewayServer : NetServer<GatewayApplicatoin, RpcSession>
+    public class RpcGatewayServer : NetServer<GatewayApplicatoin, RpcGatewaySession>
     {
         public string Host { get; set; }
 

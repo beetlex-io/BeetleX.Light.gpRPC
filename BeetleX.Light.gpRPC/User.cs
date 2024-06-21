@@ -2,6 +2,7 @@
 using Google.Protobuf;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,13 +17,47 @@ namespace BeetleX.Light.gpRPC
 
         private Dictionary<uint, uint> _whitelist = new Dictionary<uint, uint>();
 
+        public Dictionary<uint, uint> WhiteList
+        {
+            get
+            {
+                return _whitelist;
+            }
+            set
+            {
+                if (value != null)
+                    _whitelist = value;
+            }
+        }
+
+
         private Dictionary<uint, uint> _blacklist = new Dictionary<uint, uint>();
+
+        public Dictionary<uint, uint> BlackList
+        {
+            get
+            {
+                return _blacklist;
+            }
+            set
+            {
+                if (value != null)
+                    _blacklist = value;
+            }
+        }
 
         public bool Check(uint messageType)
         {
-            if (_right.Count == 0)
+            if (_whitelist.Count == 0 && _blacklist.Count == 0)
                 return true;
-            return _right.ContainsKey(messageType);
+            if (_whitelist.Count > 0)
+            {
+                return _whitelist.ContainsKey(messageType);
+            }
+            else
+            {
+                return !_blacklist.ContainsKey(messageType);
+            }
         }
 
 

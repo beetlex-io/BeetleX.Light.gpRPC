@@ -21,3 +21,7 @@ Getaway/gpRPC.Gateway.Publish/obj/gpRPC.Gateway.Publish.csproj.nuget.dgspec.json
 Getaway/gpRPC.Gateway.Publish/obj/
 Getaway/gpRPC.Gateway.Subscriber/obj/
 gpRPC.Gateway.Server/obj/
+Getaway/gpRPC.Gateway.Messages/bin/
+Getaway/gpRPC.Gateway.Publish/bin/
+Getaway/gpRPC.Gateway.Subscriber/bin/
+gpRPC.Gateway.Server/bin/

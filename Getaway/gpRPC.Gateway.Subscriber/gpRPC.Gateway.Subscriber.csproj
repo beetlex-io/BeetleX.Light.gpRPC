@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\gpRPC.Gateway.Messages\gpRPC.Gateway.Messages.csproj" />
+  </ItemGroup>
+
 </Project>
