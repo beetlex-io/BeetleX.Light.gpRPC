@@ -11,7 +11,7 @@ client.RegisterMessages<RegisterReq>();
 client.LogLevel = LogLevel.Trace;
 client.UserName = "admin";
 client.Password = "123456";
-await client.Subscribe<RegisterReq>();
+await client.Subscribe<RegisterReq, SearchUserReq>();
 await NetClientDebug.Default.Debug();
 
 public class UserHandler : IUserHandler

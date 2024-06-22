@@ -62,14 +62,14 @@ namespace BeetleX.Light.gpRPC
 
         private List<Type> _serviceTypes = new List<Type>();
 
-public void RegisterMessages<T>()
-{
-    ProtocolMessageMapperFactory.UintMapper.RegisterAssembly<T>();
-    foreach (var type in typeof(T).Assembly.GetTypes())
-    {
-        if (type.GetCustomAttribute<RpcServiceAttribute>() != null)
-            _serviceTypes.Add(type);
-    }
-}
+        public void RegisterMessages<T>()
+        {
+            ProtocolMessageMapperFactory.UintMapper.RegisterAssembly<T>();
+            foreach (var type in typeof(T).Assembly.GetTypes())
+            {
+                if (type.GetCustomAttribute<RpcServiceAttribute>() != null)
+                    _serviceTypes.Add(type);
+            }
+        }
     }
 }

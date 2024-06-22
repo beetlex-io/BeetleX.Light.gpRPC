@@ -117,7 +117,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                     var subContext = Server.MessageLoadBalancerTable.GetMessageLoadBalancer(rpcmsg.Type).GetContext();
                     if (subContext != null && !subContext.Context.Disposed)
                     {
-                        rpcmsg.Identifier = rpcmsg.Identifier | ((UInt64)gatewayID << 31);//增量网关处理ID
+                        rpcmsg.Identifier = rpcmsg.Identifier | ((UInt64)gatewayID << 32);//增量网关处理ID
                         Server.SubcribeReplyTable.SetReplyContext(rpcmsg.Identifier, context);
                         subContext.Context.Send(rpcmsg);
                         context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCGatewaySession", "Publish", $"{rpcmsg.Body.GetType().Name} message publish to {subContext.Context.RemotePoint.ToString()}");
@@ -138,7 +138,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                 {
                     var id = rpcmsg.Identifier;
                     var netContext = Server.SubcribeReplyTable.GetReplyContext(id);
-                    id = (id << 31) >> 31;//减去网关增量
+                    id = (id << 32) >> 32;//减去网关增量
                     rpcmsg.Identifier = id;
                     if (netContext != null)
                     {

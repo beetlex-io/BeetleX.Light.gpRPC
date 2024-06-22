@@ -84,6 +84,35 @@ namespace BeetleX.Light.gpRPC
 
         }
 
+        public Task Subscribe<T, T1, T2, T3, T4, T5>()
+        {
+            return Subscribe(typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
+
+        }
+
+        public Task Subscribe<T, T1, T2, T3, T4, T5, T6>()
+        {
+            return Subscribe(typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
+
+        }
+
+        public Task Subscribe<T, T1, T2, T3, T4, T5, T6, T7>()
+        {
+            return Subscribe(typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
+
+        }
+
+        public Task Subscribe<T, T1, T2, T3, T4, T5, T6, T7, T8>()
+        {
+            return Subscribe(typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8));
+
+        }
+        public Task Subscribe<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>()
+        {
+            return Subscribe(typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9));
+
+        }
+
         public async Task Subscribe(params Type[] types)
         {
             SubscribeReq req = new SubscribeReq();
@@ -106,13 +135,14 @@ namespace BeetleX.Light.gpRPC
 
         public override bool OnReceiveMessage(IAwaiterNetClient client, object msg)
         {
-            if (msg is RpcMessage gpMsg)
+            if (msg is RpcMessage rpcMsg && rpcMsg.Identifier > uint.MaxValue)
             {
-                var handler = ServiceMethodHandlers.Default.GetMethod(gpMsg.Body.GetType());
+
+                var handler = ServiceMethodHandlers.Default.GetMethod(rpcMsg.Body.GetType());
                 if (handler != null)
                 {
                     IOQueue queue;
-                    if (gpMsg.Body is IConsistency consistency)
+                    if (rpcMsg.Body is IConsistency consistency)
                     {
                         queue = IOQueueFactory.Default.GetIOQueue(consistency.ConsistencyID);
                     }
@@ -121,13 +151,25 @@ namespace BeetleX.Light.gpRPC
                         queue = IOQueueFactory.Default.NextIOQueue();
                     }
                     MessageInvokdWork work = new MessageInvokdWork();
-                    work.Message = gpMsg;
+                    work.Message = rpcMsg;
                     work.Client = this;
                     work.Handler = handler;
                     queue.Schedule(work);
                     GetLoger(LogLevel.Debug)?.Write(this, "gpRPCClient", "Receive", $"Message schedule to {queue.ID}");
                     return true;
                 }
+                else
+                {
+                    RpcMessage resp = new RpcMessage();
+                    resp.Identifier = rpcMsg.Identifier;
+                    Error error = new Error();
+                    error.ErrorCode = RpcException.METHOD_NOTFOUND;
+                    error.ErrorMessage = $"{rpcMsg.Body.GetType().Name} handler not found!";
+                    resp.Body = error;
+                    Send(resp);
+                    GetLoger(LogLevel.Warring)?.Write(this, "gpRPCClient", "InvokeError", $"{rpcMsg.Body.GetType().Name} handler not found!");
+                }
+                return true;
             }
             return base.OnReceiveMessage(client, msg);
         }
