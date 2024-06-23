@@ -7,7 +7,7 @@ RpcClient client = "tcp://localhost:8081";
 client.SslServiceName = "beetlex-io.com";
 client.AddLogOutputHandler<LogOutputToConsole>();
 client.RegisterMessages<RegisterReq>();
-client.LogLevel = LogLevel.Trace;
+client.LogLevel = LogLevel.Debug;
 client.UserName = "admin";
 client.Password = "123456";
 var userhandler = client.Create<IUserHandler>();

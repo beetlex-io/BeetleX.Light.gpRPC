@@ -74,7 +74,7 @@ namespace BeetleX.Light.gpRPC.Gateway
 
         public void RegisterMessages<T>()
         {
-            ProtocolMessageMapperFactory.UintMapper.RegisterAssembly<T>();
+            ProtocolMessageMapperFactory.UintMapper.RegisterAssembly<T>(this);
             foreach (var type in typeof(T).Assembly.GetTypes())
             {
                 if (type.GetCustomAttribute<RpcServiceAttribute>() != null)

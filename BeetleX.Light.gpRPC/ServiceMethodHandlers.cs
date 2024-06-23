@@ -57,7 +57,7 @@ namespace BeetleX.Light.gpRPC
                 }
                 if (req.GetInterface("Google.Protobuf.IMessage") != null && (method.ReturnType == typeof(Task) || resp.GetInterface("Google.Protobuf.IMessage") != null))
                 {
-                    loger.GetLoger(LogLevel.Info)?.Write((EndPoint)null, "gpRPC", "ObjectMapping", $"{req.Name} mapping to {type.Name}.{method.Name}");
+                    loger.GetLoger(LogLevel.Info)?.Write((EndPoint)null, "gpRPC", "MethodMapping", $"{req.Name} mapping to {type.Name}.{method.Name}");
                     var handler = new MethodInvokeHandler(method);
                     handler.Service = service;
                     _methods[req] = handler;

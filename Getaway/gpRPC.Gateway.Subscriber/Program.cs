@@ -7,13 +7,15 @@ using gpRPC.Gateway.Messages;
 RpcClient client = "tcp://localhost:8081";
 client.SslServiceName = "beetlex-io.com";
 client.AddLogOutputHandler<LogOutputToConsole>();
-client.RegisterMessages<RegisterReq>();
-client.LogLevel = LogLevel.Trace;
+client.RegisterMessages<RegisterReq>()
+      .RegisterMessages<UserHandler>();
+client.LogLevel = LogLevel.Debug;
 client.UserName = "admin";
 client.Password = "123456";
 await client.Subscribe<RegisterReq, SearchUserReq>();
 await NetClientDebug.Default.Debug();
 
+[RpcService]
 public class UserHandler : IUserHandler
 {
     public async Task<SearchUserResp> Search(SearchUserReq req)

@@ -212,14 +212,15 @@ namespace BeetleX.Light.gpRPC
         }
 
 
-        public void RegisterMessages<T>()
+        public RpcClient RegisterMessages<T>()
         {
-            ProtocolMessageMapperFactory.UintMapper.RegisterAssembly<T>();
+            ProtocolMessageMapperFactory.UintMapper.RegisterAssembly<T>(this);
             foreach (var type in typeof(T).Assembly.GetTypes())
             {
                 if (type.GetCustomAttribute<RpcServiceAttribute>() != null)
                     ServiceMethodHandlers.Default.Register(type, this);
             }
+            return this;
         }
         public T Create<T>()
         {
