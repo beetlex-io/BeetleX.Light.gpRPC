@@ -61,7 +61,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                         memory = memory.Slice(type.BuffersLength);
                         rpcMessage.Identifier = memory.Span.ReadUInt64();
                         memory = memory.Slice(8);
-                        if (rpcMessage.Identifier <= uint.MaxValue && rpcMessage.Type < 2000000001u)
+                        if ( rpcMessage.Type < 2000000001u)
                         {
                             //var data = MemoryPool<byte>.Shared.Rent(memory.Length);
                             TemporaryBuffer<Byte> data = memory.Length;

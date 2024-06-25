@@ -120,7 +120,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                         rpcmsg.Identifier = rpcmsg.Identifier | ((UInt64)gatewayID << 32);//增量网关处理ID
                         Server.SubcribeReplyTable.SetReplyContext(rpcmsg.Identifier, context);
                         subContext.Context.Send(rpcmsg);
-                        context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCGatewaySession", $"✉ Publish to {subContext.Context.RemotePoint.ToString()}", $"{rpcmsg.Body.GetType().Name}");
+                        context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCGatewaySession", $"✉ Publish to {subContext.Context.RemotePoint.ToString()}", $"{rpcmsg.Type}");
                     }
                     else
                     {
@@ -131,7 +131,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                         error.ErrorMessage = "Service unavailable";
                         resp.Body = error;
                         context.Send(resp);
-                        context.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCGatewaySession", "Publish", $"{rpcmsg.Body.GetType().Name} message publish error service unavailable!");
+                        context.GetLoger(LogLevel.Warring)?.Write(context, "gpRPCGatewaySession", "Publish", $"{rpcmsg.Type} message publish error service unavailable!");
                     }
                 }
                 else //订阅响应
@@ -143,7 +143,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                     if (netContext != null)
                     {
                         netContext.Send(rpcmsg);
-                        context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCGatewaySession", $"✉ Reply to {netContext.RemotePoint.ToString()}", $"{rpcmsg.Body.GetType().Name}");
+                        context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCGatewaySession", $"✉ Reply to {netContext.RemotePoint.ToString()}", $"{rpcmsg.Type}");
                     }
                 }
 
