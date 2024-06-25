@@ -21,7 +21,7 @@ namespace BeetleX.Light.gpRPC.Gateway
 
         public object Clone()
         {
-            var result = new ProtobufChannel<T>();
+            var result = new RpcGatewayChannel<T>();
             return result;
         }
 
@@ -40,11 +40,12 @@ namespace BeetleX.Light.gpRPC.Gateway
                     }
                     else
                     {
-                        IMemoryOwner<byte> data = (IMemoryOwner<byte>)rpcMessage.Body;
+                        TemporaryBuffer<Byte> data = (TemporaryBuffer<Byte>)rpcMessage.Body;
                         stream.Write(rpcMessage.Type);
                         stream.Write(rpcMessage.Identifier);
-                        stream.Write(data.Memory.Span);
+                        stream.Write(data.Span);
                         data.Dispose();
+                        Context.GetLoger(Logs.LogLevel.Debug)?.Write(Context, "gpRPCGateway", "ChannelEncoding", "Body memory disposed");
                     }
                 });
         }
@@ -60,17 +61,20 @@ namespace BeetleX.Light.gpRPC.Gateway
                         memory = memory.Slice(type.BuffersLength);
                         rpcMessage.Identifier = memory.Span.ReadUInt64();
                         memory = memory.Slice(8);
-                        if (rpcMessage.Identifier < 2000000000u)
+                        if (rpcMessage.Identifier <= uint.MaxValue && rpcMessage.Type < 2000000001u)
                         {
-                            var data = MemoryPool<byte>.Shared.Rent(memory.Length);
+                            //var data = MemoryPool<byte>.Shared.Rent(memory.Length);
+                            TemporaryBuffer<Byte> data = memory.Length;
                             memory.CopyTo(data.Memory);
                             rpcMessage.Body = data;
+                            Context.GetLoger(Logs.LogLevel.Debug)?.Write(Context, "gpRPCGateway", "ChannelDecoding", "Read body to memory");
                         }
                         else
                         {
                             IMessage message = (IMessage)Activator.CreateInstance(type.MessageType);
                             message.MergeFrom(memory.Span);
                             rpcMessage.Body = message;
+
                         }
                         return rpcMessage;
                     })

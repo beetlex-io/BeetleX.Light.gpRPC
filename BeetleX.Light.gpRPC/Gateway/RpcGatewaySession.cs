@@ -143,7 +143,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                     if (netContext != null)
                     {
                         netContext.Send(rpcmsg);
-                        context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCGatewaySession", $"✉ Reply to {netContext.RemotePoint.ToString()}", $"✉ {rpcmsg.Body.GetType().Name}");
+                        context.GetLoger(LogLevel.Debug)?.Write(context, "gpRPCGatewaySession", $"✉ Reply to {netContext.RemotePoint.ToString()}", $"{rpcmsg.Body.GetType().Name}");
                     }
                 }
 

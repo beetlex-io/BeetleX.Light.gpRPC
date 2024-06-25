@@ -46,7 +46,7 @@ namespace BeetleX.Light.gpRPC.Gateway
             {
                 o.Port = Port;
                 o.Host = Host;
-                o.SetProtocolChannel<ProtobufChannel<NetContext>>();
+                o.SetProtocolChannel<RpcGatewayChannel<NetContext>>();
             });
             if (!string.IsNullOrEmpty(CertificateFile))
             {
@@ -56,7 +56,7 @@ namespace BeetleX.Light.gpRPC.Gateway
                     o.Port = TLSPort;
                     o.EnabledSSL(CertificateFile, CertificatePassword,
                        SslProtocols);
-                    o.SetProtocolChannel<ProtobufChannel<NetContext>>();
+                    o.SetProtocolChannel<RpcGatewayChannel<NetContext>>();
                 });
             }
             base.Start();

@@ -9,7 +9,7 @@ client.SslServiceName = "beetlex-io.com";
 client.AddLogOutputHandler<LogOutputToConsole>();
 client.RegisterMessages<RegisterReq>()
       .RegisterMessages<UserHandler>();
-client.LogLevel = LogLevel.Debug;
+client.LogLevel = LogLevel.Trace;
 client.UserName = "admin";
 client.Password = "123456";
 await client.Subscribe<RegisterReq, SearchUserReq>();
@@ -35,9 +35,12 @@ public class UserHandler : IUserHandler
         }
         return resp;
     }
-    public Task<RegisterResp> Register(RegisterReq req)
+    public async Task<RegisterResp> Register(RegisterReq req)
     {
-        throw new NotImplementedException();
+        RegisterResp resp = new RegisterResp();
+        resp.Success = true;
+        resp.Time = DateTime.Now.Ticks;
+        return resp;
     }
 
     public Task SetTime(SetTimeReq req)

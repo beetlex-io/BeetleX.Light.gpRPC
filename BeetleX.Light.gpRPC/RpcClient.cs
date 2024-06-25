@@ -155,7 +155,7 @@ namespace BeetleX.Light.gpRPC
                     work.Client = this;
                     work.Handler = handler;
                     queue.Schedule(work);
-                    GetLoger(LogLevel.Debug)?.Write(this, "gpRPCClient", "Receive", $"Message schedule to {queue.ID}");
+                    GetLoger(LogLevel.Debug)?.Write(this, "gpRPCClient", "Receive to queue", $"{rpcMsg.Body.GetType().Name} schedule to {queue.ID}");
                     return true;
                 }
                 else
