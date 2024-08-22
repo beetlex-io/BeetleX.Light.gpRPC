@@ -122,52 +122,52 @@ namespace BeetleX.Light.gpRPC
             }
         }
 
-protected virtual async Task OnReceiveMessage(RpcMessage req)
-{
-
-    RpcMessage resp = new RpcMessage();
-    resp.Identifier = req.Identifier;
-    var method = ServiceMethodHandlers.Default.GetMethod(req.Body.GetType());
-    if (method != null)
-    {
-        try
+        protected virtual async Task OnReceiveMessage(RpcMessage req)
         {
-            Task task = (Task)method.Method.Invoke(method.Service, new object[] { req.Body });
-            await task;
-            if (method.ResultProperty != null)
+
+            RpcMessage resp = new RpcMessage();
+            resp.Identifier = req.Identifier;
+            var method = ServiceMethodHandlers.Default.GetMethod(req.Body.GetType());
+            if (method != null)
             {
-                var result = method.ResultProperty.GetValue(task);
-                resp.Body = result;
+                try
+                {
+                    Task task = (Task)method.Method.Invoke(method.Service, new object[] { req.Body });
+                    await task;
+                    if (method.ResultProperty != null)
+                    {
+                        var result = method.ResultProperty.GetValue(task);
+                        resp.Body = result;
+                    }
+                    else
+                    {
+                        Success success = new Success();
+                        resp.Body = success;
+                    }
+                    NetContext.GetLoger(LogLevel.Debug)?.Write(NetContext, "gpRPCSession", "InvokeSuccess", $"{req.Body.GetType().Name}");
+
+                }
+                catch (Exception e_)
+                {
+                    Error error = new Error();
+                    error.ErrorCode = RpcException.METHOD_INVOKE_ERROR;
+                    error.ErrorMessage = e_.Message;
+                    error.StackTrace = e_.StackTrace;
+                    resp.Body = error;
+                    NetContext?.GetLoger(LogLevel.Error)?.Write(NetContext, "gpRPCSession", "InvokeError", $"{req.Body.GetType().Name} invok error {e_.Message} {e_.StackTrace}!");
+                }
+
             }
             else
             {
-                Success success = new Success();
-                resp.Body = success;
+                Error error = new Error();
+                error.ErrorCode = RpcException.METHOD_NOTFOUND;
+                error.ErrorMessage = $"{req.Body.GetType().Name} handler not found!";
+                resp.Body = error;
+                NetContext?.GetLoger(LogLevel.Warring)?.Write(NetContext, "gpRPCSession", "InvokeError", $"{req.Body.GetType().Name} handler not found!");
             }
-            NetContext.GetLoger(LogLevel.Debug)?.Write(NetContext, "gpRPCSession", "InvokeSuccess", $"{req.Body.GetType().Name}");
-
+            NetContext?.Send(resp);
         }
-        catch (Exception e_)
-        {
-            Error error = new Error();
-            error.ErrorCode = RpcException.METHOD_INVOKE_ERROR;
-            error.ErrorMessage = e_.Message;
-            error.StackTrace = e_.StackTrace;
-            resp.Body = error;
-            NetContext?.GetLoger(LogLevel.Error)?.Write(NetContext, "gpRPCSession", "InvokeError", $"{req.Body.GetType().Name} invok error {e_.Message} {e_.StackTrace}!");
-        }
-
-    }
-    else
-    {
-        Error error = new Error();
-        error.ErrorCode = RpcException.METHOD_NOTFOUND;
-        error.ErrorMessage = $"{req.Body.GetType().Name} handler not found!";
-        resp.Body = error;
-        NetContext?.GetLoger(LogLevel.Warring)?.Write(NetContext, "gpRPCSession", "InvokeError", $"{req.Body.GetType().Name} handler not found!");
-    }
-    NetContext?.Send(resp);
-}
 
         public virtual void ReceiveCompleted(int bytes)
         {

@@ -9,7 +9,7 @@ server.CertificateFile = "generate.pfx";
 server.CertificatePassword = "12345678";
 server.RegisterMessages<RegisterReq>();
 server.Options.AddLogOutputHandler<LogOutputToConsole>();
-server.Options.LogLevel = LogLevel.Trace;
+server.Options.LogLevel = LogLevel.Info;
 
 server.Start();
 await server.Debug();

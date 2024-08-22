@@ -38,10 +38,10 @@ namespace BeetleX.Light.gpRPC.Gateway
         public override void Start()
         {
             RegisterMessages<RpcClient>();
-            Options.SynchronousIO = false;
-            Options.SessionSingleIOQueue = false;
+            Options.SynchronousIO = true;
+            Options.SessionSingleIOQueue = true;
             Options.ServerName = "google protobuf rpc gateway";
-            Options.ReturnSendDelay = true;
+
             Options.SetDefaultListen(o =>
             {
                 o.Port = Port;

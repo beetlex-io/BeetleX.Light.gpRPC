@@ -9,7 +9,8 @@ client.SslServiceName = "beetlex-io.com";
 client.AddLogOutputHandler<LogOutputToConsole>();
 client.RegisterMessages<RegisterReq>()
       .RegisterMessages<UserHandler>();
-client.LogLevel = LogLevel.Trace;
+client.ReturnSendDelay = false;
+client.LogLevel = LogLevel.Info;
 client.UserName = "admin";
 client.Password = "123456";
 await client.Subscribe<RegisterReq, SearchUserReq>();

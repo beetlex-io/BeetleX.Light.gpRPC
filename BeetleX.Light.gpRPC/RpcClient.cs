@@ -20,7 +20,7 @@ namespace BeetleX.Light.gpRPC
         {
             ReturnSendDelay = false;
             RegisterMessages<RpcClient>();
-            TimeOut = 1000000;
+            TimeOut = 10000;
             Connecting = OnConnect;
         }
 
